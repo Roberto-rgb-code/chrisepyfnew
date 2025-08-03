@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empaques & Fundas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+  <!-- Barra de promoción -->
+  <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-2 text-sm font-medium">
+    🎉 ¡ENVÍO GRATIS en pedidos +$500 MXN! | 📱 +1000 fundas vendidas | ⭐ 4.9/5 estrellas
+  </div>
+
+  <!-- Navbar ecommerce completo -->
+  <header class="navbar">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo y marca -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <i data-lucide="smartphone" class="w-6 h-6 text-white"></i>
+            </div>
+            <span class="logo-text">Empaques & Fundas</span>
+          </div>
+        </div>
+
+        <!-- Navegación principal -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#" class="nav-link active">Personalizar</a>
+          <a href="#" class="nav-link">Catálogo</a>
+          <a href="#" class="nav-link">Fundas Gaming</a>
+          <a href="#" class="nav-link">Ofertas</a>
+          <a href="#" class="nav-link">Reviews</a>
+        </div>
+
+        <!-- Acciones del usuario -->
+        <div class="flex items-center space-x-4">
+          <!-- Búsqueda -->
+          <div class="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
+            <i data-lucide="search" class="w-4 h-4 text-gray-500 mr-2"></i>
+            <input type="text" placeholder="Buscar modelos..." class="bg-transparent text-sm outline-none w-32">
+          </div>
+          
+          <!-- Favoritos -->
+          <button class="relative p-2 text-gray-600 hover:text-red-500 transition-colors">
+            <i data-lucide="heart" class="w-5 h-5"></i>
+            <span class="cart-badge">2</span>
+          </button>
+          
+          <!-- Carrito -->
+          <button class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+            <span class="cart-badge">0</span>
+          </button>
+          
+          <!-- Usuario -->
+          <button class="p-2 text-gray-600 hover:text-blue-600 transition-colors">
+            <i data-lucide="user" class="w-5 h-5"></i>
+          </button>
+          
+          <!-- Menú móvil -->
+          <button class="md:hidden p-2 text-gray-600">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <nav class="flex text-sm text-gray-500">
+        <a href="#" class="hover:text-blue-600">Inicio</a>
+        <span class="mx-2">/</span>
+        <a href="#" class="hover:text-blue-600">Fundas Personalizadas</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 font-medium">Personalizar Funda</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <!-- Sidebar Izquierdo -->
+    <div class="sidebar-left fade-in">
+      <h2 class="sidebar-title">📱 Selecciona tu Modelo</h2>
+      <select id="model-select" class="model-select">
+        <!-- Las opciones se generarán con JavaScript -->
+      </select>
+
+      <h2 class="sidebar-title upload-title">🖼️ Sube tu Imagen</h2>
+      <label class="upload-area">
+        <span class="upload-icon">📤</span>
+        <span class="upload-text">Arrastra tu imagen aquí</span>
+        <input
+          type="file"
+          id="image-upload"
+          class="upload-input"
+          accept="image/*"
+        />
+      </label>
+
+      <div id="image-preview-container" class="image-preview-container" style="display: none;">
+        <img id="image-preview" src="" alt="Preview" class="image-preview" />
+        <button id="clear-image" class="primary-button clear-button">
+          🗑️ Limpiar Imagen
+        </button>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div class="flex items-start space-x-2">
+          <i data-lucide="info" class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0"></i>
+          <div class="text-xs text-blue-800">
+            <p class="font-semibold">Tips para mejor calidad:</p>
+            <ul class="mt-1 space-y-1">
+              <li>• Usa imágenes de alta resolución</li>
+              <li>• Formato JPG o PNG recomendado</li>
+              <li>• Evita imágenes muy oscuras</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de Preview Central -->
+    <div class="case-preview fade-in">
+      <div class="case-container" id="case-container">
+        <img id="base-image" src="" alt="Modelo Base" class="base-image" />
+        <div id="custom-image-container" class="custom-image-container" style="display: none;">
+          <div id="custom-image-wrapper" class="custom-image-wrapper">
+            <img id="custom-image" src="" alt="Custom Design" class="custom-image" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicadores de calidad -->
+      <div class="mt-4 flex justify-center space-x-4 text-sm text-gray-600">
+        <div class="flex items-center space-x-1">
+          <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
+          <span>Protección Premium</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <i data-lucide="truck" class="w-4 h-4 text-blue-600"></i>
+          <span>Envío 24-48h</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <i data-lucide="award" class="w-4 h-4 text-yellow-600"></i>
+          <span>Garantía 2 años</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Derecho - OPTIMIZADO SIN SCROLL -->
+    <div class="sidebar-right fade-in">
+      <!-- Precio destacado -->
+      <div class="price-section">
+        <div class="price-amount">$299 MXN</div>
+        <div class="price-subtitle">Envío gratis incluido</div>
+      </div>
+
+      <!-- Botón principal -->
+      <div id="main-controls">
+        <button id="add-to-cart" class="primary-button add-to-cart-button">
+          🛒 Agregar al Carrito
+        </button>
+      </div>
+
+      <!-- Formulario de checkout -->
+      <div id="checkout-form-container" style="display: none;">
+        <div class="checkout-form">
+          <h3>✅ Finalizar Compra</h3>
+          <input type="text" id="client-name" placeholder="Nombre completo" required />
+          <input type="tel" id="client-phone" placeholder="Teléfono" required />
+          <input type="email" id="client-email" placeholder="Email" required />
+          <input type="text" id="client-address" placeholder="Dirección" required />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="client-postal-code" placeholder="C.P." required />
+            <input type="text" id="client-state" placeholder="Estado" required />
+          </div>
+          <input type="text" id="client-country" placeholder="País" required />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="client-exterior-number" placeholder="No. Ext" required />
+            <input type="text" id="client-interior-number" placeholder="No. Int" />
+          </div>
+          <button id="proceed-payment" class="primary-button checkout-button">
+            💳 Proceder al Pago
+          </button>
+          <button id="cancel-checkout" class="primary-button clear-button">
+            ❌ Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- Controles de edición compactos -->
+      <div class="control-section">
+        <h3 class="control-title">🔍 Escala</h3>
+        <div class="control-buttons">
+          <button id="scale-down" class="control-button" title="Reducir">−</button>
+          <button id="scale-up" class="control-button" title="Ampliar">+</button>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3 class="control-title">🔄 Rotación</h3>
+        <div class="control-buttons">
+          <button id="rotate-left" class="control-button" title="Rotar izquierda">↺</button>
+          <button id="rotate-right" class="control-button" title="Rotar derecha">↻</button>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3 class="control-title">↔️ Voltear</h3>
+        <div class="control-buttons">
+          <button id="flip-horizontal" class="control-button" title="Voltear horizontal">⇄</button>
+          <button id="flip-vertical" class="control-button" title="Voltear vertical">⇅</button>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3 class="control-title">📍 Posición</h3>
+        <div class="move-controls">
+          <div></div>
+          <button id="move-up" class="move-button" title="Mover arriba">↑</button>
+          <div></div>
+          <button id="move-left" class="move-button" title="Mover izquierda">←</button>
+          <div class="move-center">
+            <i data-lucide="crosshair" class="w-3 h-3 text-gray-500"></i>
+          </div>
+          <button id="move-right" class="move-button" title="Mover derecha">→</button>
+          <div></div>
+          <button id="move-down" class="move-button" title="Mover abajo">↓</button>
+          <div></div>
+        </div>
+        <p class="text-xs text-gray-500 text-center mt-2">Usa las flechas del teclado</p>
+      </div>
+
+      <!-- Botón reset -->
+      <button id="reset-transform" class="primary-button" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; margin-top: 0.5rem;">
+        🔄 Resetear Posición
+      </button>
+
+      <!-- Botón eliminar -->
+      <button id="remove-image" class="primary-button remove-button">
+        🗑️ Eliminar Imagen
+      </button>
+
+      <!-- Garantías y beneficios -->
+      <div class="mt-auto p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border">
+        <div class="text-xs space-y-2">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="check-circle" class="w-3 h-3 text-green-600"></i>
+            <span class="text-green-800 font-medium">Garantía de satisfacción</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <i data-lucide="refresh-cw" class="w-3 h-3 text-blue-600"></i>
+            <span class="text-blue-800 font-medium">Cambios y devoluciones</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shield" class="w-3 h-3 text-purple-600"></i>
+            <span class="text-purple-800 font-medium">Pago 100% seguro</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer ecommerce -->
+  <footer class="bg-gray-900 text-white mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <i data-lucide="smartphone" class="w-5 h-5 text-white"></i>
+            </div>
+            <span class="text-xl font-bold">Customizely</span>
+          </div>
+          <p class="text-gray-400 text-sm mb-4">Fundas personalizadas de la más alta calidad. Protege tu dispositivo con estilo único.</p>
+          <div class="flex space-x-3">
+            <i data-lucide="facebook" class="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"></i>
+            <i data-lucide="instagram" class="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"></i>
+            <i data-lucide="twitter" class="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"></i>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Productos</h3>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="#" class="hover:text-white">Fundas iPhone</a></li>
+            <li><a href="#" class="hover:text-white">Fundas Samsung</a></li>
+            <li><a href="#" class="hover:text-white">Fundas Gaming</a></li>
+            <li><a href="#" class="hover:text-white">Protectores</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Soporte</h3>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="#" class="hover:text-white">Centro de Ayuda</a></li>
+            <li><a href="#" class="hover:text-white">Envíos y Devoluciones</a></li>
+            <li><a href="#" class="hover:text-white">Garantía</a></li>
+            <li><a href="#" class="hover:text-white">Contacto</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+          <p class="text-sm text-gray-400 mb-4">Recibe ofertas exclusivas y nuevos diseños</p>
+          <div class="flex">
+            <input type="email" placeholder="Tu email" class="flex-1 px-3 py-2 bg-gray-800 text-white rounded-l-lg text-sm">
+            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-r-lg transition-colors">
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+        <p>&copy; 2025 Customizely. Todos los derechos reservados. | Política de Privacidad | Términos de Servicio</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
