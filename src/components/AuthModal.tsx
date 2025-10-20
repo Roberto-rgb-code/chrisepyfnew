@@ -19,7 +19,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login, signup } = useAuth();
+  const auth = useAuth();
+  const { login, signup } = auth || {};
 
   useEffect(() => {
     setMode(initialMode);
@@ -53,8 +54,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
           setLoading(false);
           return;
         }
+        if (!signup) {
+          setError('Error de autenticación. Intenta recargar la página.');
+          setLoading(false);
+          return;
+        }
         await signup(email, password, name);
       } else {
+        if (!login) {
+          setError('Error de autenticación. Intenta recargar la página.');
+          setLoading(false);
+          return;
+        }
         await login(email, password);
       }
       onClose();

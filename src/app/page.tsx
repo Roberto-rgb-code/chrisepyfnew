@@ -27,7 +27,8 @@ export default function Home() {
   const [showImageWarning, setShowImageWarning] = useState(false);
 
   const { addToCart } = useCart();
-  const { user } = useAuth();
+  const auth = useAuth();
+  const { user } = auth || {};
   const router = useRouter();
 
   const handleModelChange = (model: PhoneModel) => {
@@ -65,24 +66,32 @@ export default function Home() {
   };
 
   const handleAddToCart = () => {
-    if (!userImageSrc) {
-      setShowImageWarning(true);
-      return;
+    try {
+      if (!userImageSrc) {
+        setShowImageWarning(true);
+        return;
+      }
+
+      const cartItem = {
+        id: `${selectedModel.id}-${Date.now()}`,
+        modelName: selectedModel.modelName,
+        colorURL: selectedModel.colorURL,
+        maskURL: selectedModel.maskURL,
+        customImage: userImageSrc,
+        price: 299,
+        quantity: 1,
+        imageControls: { ...imageControls }
+      };
+
+      if (addToCart) {
+        addToCart(cartItem);
+        setShowCartSuccess(true);
+      } else {
+        console.error('addToCart function not available');
+      }
+    } catch (error) {
+      console.error('Error in handleAddToCart:', error);
     }
-
-    const cartItem = {
-      id: `${selectedModel.id}-${Date.now()}`,
-      modelName: selectedModel.modelName,
-      colorURL: selectedModel.colorURL,
-      maskURL: selectedModel.maskURL,
-      customImage: userImageSrc,
-      price: 299,
-      quantity: 1,
-      imageControls: { ...imageControls }
-    };
-
-    addToCart(cartItem);
-    setShowCartSuccess(true);
   };
 
   const handleGoToCart = () => {

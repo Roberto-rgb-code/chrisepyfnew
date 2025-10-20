@@ -64,15 +64,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart]);
 
   const addToCart = (item: CartItem) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((i) => i.id === item.id);
-      if (existingItem) {
-        return prevCart.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prevCart, item];
-    });
+    try {
+      setCart((prevCart) => {
+        const existingItem = prevCart.find((i) => i.id === item.id);
+        if (existingItem) {
+          return prevCart.map((i) =>
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          );
+        }
+        return [...prevCart, item];
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
   };
 
   const removeFromCart = (id: string) => {

@@ -213,11 +213,19 @@ export default function CaseCustomizer({
   };
 
   const handleAddToCartClick = () => {
-    if (!isAuthenticated) {
-      setShowAuthWarning(true);
-      return;
+    try {
+      if (!isAuthenticated) {
+        setShowAuthWarning(true);
+        return;
+      }
+      if (onAddToCart) {
+        onAddToCart();
+      } else {
+        console.error('onAddToCart function not available');
+      }
+    } catch (error) {
+      console.error('Error in handleAddToCartClick:', error);
     }
-    onAddToCart();
   };
 
   const handleLoginFromWarning = () => {
