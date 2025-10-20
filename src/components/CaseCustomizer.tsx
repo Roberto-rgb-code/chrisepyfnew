@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { PhoneModel } from '@/data/phoneData';
 import { Crosshair } from 'lucide-react';
 import Image from 'next/image';
+import AuthWarningModal from './AuthWarningModal';
 
 export interface ImageControls {
   scale: number;
@@ -23,6 +24,8 @@ interface CaseCustomizerProps {
   imageControls: ImageControls;
   onImageControlsChange: (controls: ImageControls) => void;
   onAddToCart: () => void;
+  isAuthenticated: boolean;
+  onLoginClick: () => void;
 }
 
 export default function CaseCustomizer({
@@ -34,11 +37,14 @@ export default function CaseCustomizer({
   onImageClear,
   imageControls,
   onImageControlsChange,
-  onAddToCart
+  onAddToCart,
+  isAuthenticated,
+  onLoginClick
 }: CaseCustomizerProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
+  const [showAuthWarning, setShowAuthWarning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard controls
@@ -206,6 +212,19 @@ export default function CaseCustomizer({
     setIsDragging(false);
   };
 
+  const handleAddToCartClick = () => {
+    if (!isAuthenticated) {
+      setShowAuthWarning(true);
+      return;
+    }
+    onAddToCart();
+  };
+
+  const handleLoginFromWarning = () => {
+    setShowAuthWarning(false);
+    onLoginClick();
+  };
+
   const customImageStyle = {
     transform: `translate(${imageControls.position.x}px, ${imageControls.position.y}px) scale(${imageControls.scale * imageControls.flipX}, ${imageControls.scale * imageControls.flipY}) rotate(${imageControls.rotation}deg)`,
     transformOrigin: 'center'
@@ -332,7 +351,7 @@ export default function CaseCustomizer({
           <div className="price-subtitle">Envío gratis incluido</div>
         </div>
 
-        <button onClick={onAddToCart} className="primary-button add-to-cart-button">
+        <button onClick={handleAddToCartClick} className="primary-button add-to-cart-button">
           🛒 Agregar al Carrito
         </button>
 
@@ -411,6 +430,13 @@ export default function CaseCustomizer({
           </div>
         </div>
       </div>
+
+      {/* Modal de advertencia de autenticación */}
+      <AuthWarningModal
+        isOpen={showAuthWarning}
+        onClose={() => setShowAuthWarning(false)}
+        onLogin={handleLoginFromWarning}
+      />
     </div>
   );
 }

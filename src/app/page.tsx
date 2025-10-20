@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CaseCustomizer, { ImageControls } from '@/components/CaseCustomizer';
+import AuthModal from '@/components/AuthModal';
 import { phoneData, PhoneModel } from '@/data/phoneData';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,6 +20,7 @@ export default function Home() {
     flipY: 1,
     position: { x: 0, y: 0 }
   });
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const { addToCart } = useCart();
   const { user } = useAuth();
@@ -64,11 +66,6 @@ export default function Home() {
       return;
     }
 
-    if (!user) {
-      alert('Debes iniciar sesión para agregar al carrito. Por favor inicia sesión desde el menú.');
-      return;
-    }
-
     const cartItem = {
       id: `${selectedModel.id}-${Date.now()}`,
       modelName: selectedModel.modelName,
@@ -92,6 +89,10 @@ export default function Home() {
     }
   };
 
+  const handleLoginClick = () => {
+    setShowAuthModal(true);
+  };
+
   return (
     <>
       <Navbar />
@@ -105,8 +106,17 @@ export default function Home() {
         imageControls={imageControls}
         onImageControlsChange={setImageControls}
         onAddToCart={handleAddToCart}
+        isAuthenticated={!!user}
+        onLoginClick={handleLoginClick}
       />
       <Footer />
+      
+      {/* Modal de autenticación */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="login"
+      />
     </>
   );
 }
