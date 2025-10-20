@@ -20,7 +20,12 @@ export async function uploadDesignImage(
   userId: string
 ): Promise<UploadResult> {
   try {
+    console.log('🔧 uploadDesignImage iniciado');
+    console.log('📦 Storage disponible:', !!storage);
+    console.log('👤 User ID:', userId);
+    
     if (!storage) {
+      console.error('❌ Firebase Storage no está inicializado');
       throw new Error('Firebase Storage no está inicializado');
     }
 
@@ -30,11 +35,14 @@ export async function uploadDesignImage(
     const fileName = `design_${timestamp}_${uuidv4()}.${fileExtension}`;
     const storagePath = `custom_images/${userId}/${fileName}`;
 
+    console.log('📁 Ruta de almacenamiento:', storagePath);
+
     // Crear referencia en Storage
     const storageRef = ref(storage, storagePath);
+    console.log('📤 Referencia creada:', storageRef);
 
     // Subir archivo
-    console.log('Subiendo imagen a:', storagePath);
+    console.log('🚀 Iniciando uploadBytes...');
     await uploadBytes(storageRef, file, {
       contentType: file.type || 'image/jpeg',
       customMetadata: {
@@ -44,9 +52,12 @@ export async function uploadDesignImage(
       }
     });
 
+    console.log('✅ uploadBytes completado');
+
     // Obtener URL pública
+    console.log('🔗 Obteniendo URL de descarga...');
     const downloadUrl = await getDownloadURL(storageRef);
-    console.log('Imagen subida exitosamente:', downloadUrl);
+    console.log('✅ URL obtenida:', downloadUrl);
 
     return {
       success: true,
@@ -54,7 +65,13 @@ export async function uploadDesignImage(
       storagePath: storagePath
     };
   } catch (error: any) {
-    console.error('Error subiendo imagen:', error);
+    console.error('💥 Error subiendo imagen:', error);
+    console.error('📋 Detalles del error:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
     return {
       success: false,
       error: error.message

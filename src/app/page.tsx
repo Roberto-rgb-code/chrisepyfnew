@@ -47,21 +47,36 @@ export default function Home() {
   };
 
   const handleImageUpload = async (file: File | null) => {
+    console.log('🖼️ handleImageUpload llamado con:', file);
+    
     if (!file) {
+      console.log('❌ No hay archivo');
       setUserImageSrc(null);
       return;
     }
 
     if (!user) {
+      console.log('❌ Usuario no autenticado');
       alert('Debes iniciar sesión para subir imágenes');
       return;
     }
 
+    console.log('✅ Usuario autenticado:', user.uid);
+    console.log('📁 Archivo a subir:', {
+      name: file.name,
+      size: file.size,
+      type: file.type
+    });
+
     try {
       // Subir imagen a Firebase Storage
+      console.log('🚀 Iniciando subida a Firebase Storage...');
       const uploadResult = await uploadDesignImage(file, user.uid);
       
+      console.log('📤 Resultado de subida:', uploadResult);
+      
       if (uploadResult.success && uploadResult.url) {
+        console.log('✅ Imagen subida exitosamente:', uploadResult.url);
         setUserImageSrc(uploadResult.url);
         setImageControls({
           scale: 1,
@@ -70,14 +85,14 @@ export default function Home() {
           flipY: 1,
           position: { x: 0, y: 0 }
         });
-        console.log('Imagen subida exitosamente:', uploadResult.url);
+        alert('¡Imagen subida exitosamente!');
       } else {
-        console.error('Error subiendo imagen:', uploadResult.error);
-        alert('Error al subir la imagen. Por favor, inténtalo de nuevo.');
+        console.error('❌ Error subiendo imagen:', uploadResult.error);
+        alert(`Error al subir la imagen: ${uploadResult.error}`);
       }
     } catch (error) {
-      console.error('Error en handleImageUpload:', error);
-      alert('Error al subir la imagen. Por favor, inténtalo de nuevo.');
+      console.error('💥 Error en handleImageUpload:', error);
+      alert(`Error al subir la imagen: ${error}`);
     }
   };
 
