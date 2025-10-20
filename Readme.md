@@ -210,3 +210,8 @@ Este proyecto es privado y no tiene licencia pública.
 ---
 
 **Desarrollado con ❤️ usando Next.js 14, Firebase y Stripe**
+
+## 🚀 Última actualización
+- ✅ Modal de advertencia para usuarios no autenticados
+- ✅ Configuración optimizada para Vercel
+- ✅ Build exitoso sin errores
