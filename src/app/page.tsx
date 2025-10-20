@@ -5,6 +5,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CaseCustomizer, { ImageControls } from '@/components/CaseCustomizer';
 import AuthModal from '@/components/AuthModal';
+import CartSuccessModal from '@/components/CartSuccessModal';
+import ImageWarningModal from '@/components/ImageWarningModal';
 import { phoneData, PhoneModel } from '@/data/phoneData';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +23,8 @@ export default function Home() {
     position: { x: 0, y: 0 }
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCartSuccess, setShowCartSuccess] = useState(false);
+  const [showImageWarning, setShowImageWarning] = useState(false);
 
   const { addToCart } = useCart();
   const { user } = useAuth();
@@ -62,7 +66,7 @@ export default function Home() {
 
   const handleAddToCart = () => {
     if (!userImageSrc) {
-      alert('Por favor sube una imagen antes de agregar al carrito.');
+      setShowImageWarning(true);
       return;
     }
 
@@ -78,15 +82,17 @@ export default function Home() {
     };
 
     addToCart(cartItem);
-    alert('¡Producto agregado al carrito!');
-    
-    // Preguntar si quiere ir al carrito o seguir comprando
-    if (confirm('¿Deseas ir al carrito para finalizar tu compra?')) {
-      router.push('/carrito');
-    } else {
-      // Limpiar para que pueda personalizar otra funda
-      handleImageClear();
-    }
+    setShowCartSuccess(true);
+  };
+
+  const handleGoToCart = () => {
+    setShowCartSuccess(false);
+    router.push('/carrito');
+  };
+
+  const handleContinueShopping = () => {
+    setShowCartSuccess(false);
+    handleImageClear();
   };
 
   const handleLoginClick = () => {
@@ -116,6 +122,20 @@ export default function Home() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode="login"
+      />
+
+      {/* Modal de éxito del carrito */}
+      <CartSuccessModal
+        isOpen={showCartSuccess}
+        onClose={() => setShowCartSuccess(false)}
+        onGoToCart={handleGoToCart}
+        onContinueShopping={handleContinueShopping}
+      />
+
+      {/* Modal de advertencia de imagen */}
+      <ImageWarningModal
+        isOpen={showImageWarning}
+        onClose={() => setShowImageWarning(false)}
       />
     </>
   );
