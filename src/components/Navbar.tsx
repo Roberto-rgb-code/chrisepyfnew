@@ -132,18 +132,6 @@ export default function Navbar() {
     />
   </header>
 
-      {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <nav className="flex text-sm text-gray-500">
-            <Link href="/" className="hover:text-blue-600">Inicio</Link>
-            <span className="mx-2">/</span>
-            <Link href="/" className="hover:text-blue-600">Fundas Personalizadas</Link>
-            <span className="mx-2">/</span>
-            <span className="text-gray-900 font-medium">Personalizar Funda</span>
-          </nav>
-        </div>
-      </div>
     </>
   );
 }
