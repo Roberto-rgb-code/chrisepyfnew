@@ -19,10 +19,15 @@ export async function POST(request: NextRequest) {
         currency: 'mxn',
         product_data: {
           name: `Funda Personalizada - ${item.modelName}`,
-          description: 'Funda personalizada con tu diseño',
-          images: [item.colorURL],
+          description: item.customImage ? 'Con diseño personalizado' : 'Funda sin personalizar',
+          images: item.customImage ? [item.customImage] : [item.colorURL],
+          metadata: {
+            productId: item.id,
+            modelName: item.modelName,
+            customImageUrl: item.customImage || '',
+          },
         },
-        unit_amount: item.price * 100, // Stripe usa centavos
+        unit_amount: Math.round(item.price * 100),
       },
       quantity: item.quantity,
     }));
@@ -37,12 +42,20 @@ export async function POST(request: NextRequest) {
       customer_email: userEmail,
       metadata: {
         userId,
+        userEmail: userEmail,
         items: JSON.stringify(items.map((item: any) => ({
           id: item.id,
           modelName: item.modelName,
           quantity: item.quantity,
           price: item.price,
+          customImage: item.customImage || '',
         }))),
+        customImages: JSON.stringify(items.reduce((acc: any, item: any) => {
+          if (item.customImage) {
+            acc[item.id] = item.customImage;
+          }
+          return acc;
+        }, {})),
       },
     });
 

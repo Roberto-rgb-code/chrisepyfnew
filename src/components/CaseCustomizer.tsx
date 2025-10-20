@@ -19,7 +19,7 @@ interface CaseCustomizerProps {
   onModelChange: (model: PhoneModel) => void;
   models: PhoneModel[];
   userImageSrc: string | null;
-  onImageUpload: (imageSrc: string) => void;
+  onImageUpload: (file: File | null) => void;
   onImageClear: () => void;
   imageControls: ImageControls;
   onImageControlsChange: (controls: ImageControls) => void;
@@ -93,13 +93,8 @@ export default function CaseCustomizer({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          onImageUpload(ev.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      // Pasar el objeto File directamente a onImageUpload
+      onImageUpload(file);
     }
   };
 

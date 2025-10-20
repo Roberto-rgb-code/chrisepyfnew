@@ -35,9 +35,17 @@ export const emailTemplates = {
               <h3 style="color: #333;">🛍️ Productos</h3>
               ${orderData.items.map((item: any) => `
                 <div style="border: 1px solid #e0e0e0; padding: 15px; margin: 10px 0; border-radius: 8px;">
-                  <h4 style="margin: 0 0 10px 0; color: #333;">${item.modelName}</h4>
-                  <p style="margin: 5px 0; color: #666;">Cantidad: ${item.quantity}</p>
-                  <p style="margin: 5px 0; color: #666;">Precio: $${item.price} MXN</p>
+                  <div style="display: flex; align-items: center; gap: 15px;">
+                    ${item.customImage ? `
+                      <img src="${item.customImage}" alt="Diseño personalizado" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; border: 1px solid #ddd;">
+                    ` : ''}
+                    <div style="flex: 1;">
+                      <h4 style="margin: 0 0 10px 0; color: #333;">${item.modelName}</h4>
+                      <p style="margin: 5px 0; color: #666;">Cantidad: ${item.quantity}</p>
+                      <p style="margin: 5px 0; color: #666;">Precio: $${item.price} MXN</p>
+                      ${item.customImage ? '<p style="margin: 5px 0; color: #28a745; font-weight: bold;">🎨 Con diseño personalizado</p>' : ''}
+                    </div>
+                  </div>
                 </div>
               `).join('')}
             </div>

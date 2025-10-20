@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { resend } from '@/lib/resend';
 import { emailTemplates } from '@/lib/email-templates';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -56,16 +58,45 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       return;
     }
 
+    // Parsear items y customImages
+    const items = metadata?.items ? JSON.parse(metadata.items) : [];
+    const customImages = metadata?.customImages ? JSON.parse(metadata.customImages) : {};
+
     // Crear datos del pedido
     const orderData = {
       id: session.id,
       customerName: customer_email.split('@')[0], // Usar parte del email como nombre
       customerEmail: customer_email,
       total: (session.amount_total || 0) / 100, // Convertir de centavos
-      items: metadata?.items ? JSON.parse(metadata.items) : [],
+      items: items.map((item: any) => ({
+        ...item,
+        customImage: customImages[item.id] || null
+      })),
       status: 'confirmed',
       date: new Date().toISOString(),
     };
+
+    // Guardar orden en Firestore
+    if (db) {
+      try {
+        await addDoc(collection(db, 'orders'), {
+          orderId: session.id,
+          userId: metadata?.userId || 'guest',
+          customerEmail: customer_email,
+          status: 'confirmed',
+          paymentStatus: session.payment_status,
+          amountTotal: (session.amount_total || 0) / 100,
+          currency: session.currency,
+          customDesigns: customImages,
+          items: items,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        console.log('✅ Orden guardada en Firestore:', session.id);
+      } catch (firestoreError) {
+        console.error('❌ Error guardando en Firestore:', firestoreError);
+      }
+    }
 
     // Enviar email de confirmación
     await sendOrderEmail('order_confirmation', orderData, customer_email);
