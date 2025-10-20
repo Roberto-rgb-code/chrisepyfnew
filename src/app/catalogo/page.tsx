@@ -13,7 +13,7 @@ export default function CatalogoPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState('name-asc');
 
   // Filtrar y ordenar modelos
   const filteredModels = phoneData
@@ -24,17 +24,31 @@ export default function CatalogoPage() {
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'name':
+        case 'name-asc':
           return a.modelName.localeCompare(b.modelName);
-        case 'brand':
-          return a.brand.localeCompare(b.brand);
+        case 'name-desc':
+          return b.modelName.localeCompare(a.modelName);
+        case 'brand-asc':
+          // Primero por marca, luego por nombre
+          const brandCompare = a.brand.localeCompare(b.brand);
+          if (brandCompare !== 0) return brandCompare;
+          return a.modelName.localeCompare(b.modelName);
+        case 'brand-desc':
+          const brandCompareDesc = b.brand.localeCompare(a.brand);
+          if (brandCompareDesc !== 0) return brandCompareDesc;
+          return a.modelName.localeCompare(b.modelName);
+        case 'newest':
+          // Los iPhone 17 primero, luego iPhone 16, etc.
+          return b.id.localeCompare(a.id);
+        case 'oldest':
+          return a.id.localeCompare(b.id);
         default:
           return 0;
       }
     });
 
-  // Obtener marcas únicas
-  const brands = ['all', ...Array.from(new Set(phoneData.map(model => model.brand)))];
+  // Obtener marcas únicas y ordenarlas alfabéticamente
+  const brands = ['all', ...Array.from(new Set(phoneData.map(model => model.brand))).sort()];
 
   return (
     <>
@@ -94,8 +108,12 @@ export default function CatalogoPage() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="name">Ordenar por nombre</option>
-                <option value="brand">Ordenar por marca</option>
+                <option value="name-asc">Nombre (A-Z)</option>
+                <option value="name-desc">Nombre (Z-A)</option>
+                <option value="brand-asc">Marca (A-Z)</option>
+                <option value="brand-desc">Marca (Z-A)</option>
+                <option value="newest">Más recientes</option>
+                <option value="oldest">Más antiguos</option>
               </select>
             </div>
 
