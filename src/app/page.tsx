@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [selectedModel, setSelectedModel] = useState<PhoneModel>(phoneData[0]);
+  const [selectedModel, setSelectedModel] = useState<PhoneModel>(phoneData.find(model => model.id === 'ip17promax') || phoneData[0]);
   const [userImageSrc, setUserImageSrc] = useState<string | null>(null);
   const [imageControls, setImageControls] = useState<ImageControls>({
     scale: 1,
