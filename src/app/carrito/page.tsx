@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Trash2, Plus, Minus } from 'lucide-react';
+import { redirectToCheckout } from '@/lib/stripe';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -46,7 +47,7 @@ export default function CartPage() {
 
       if (data.url) {
         // Redirigir a Stripe Checkout
-        window.location.href = data.url;
+        await redirectToCheckout(data.url);
       } else {
         alert('Error al procesar el pago');
       }
