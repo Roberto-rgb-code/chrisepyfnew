@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CasePreview from '@/components/CasePreview';
+import CheckoutModal from '@/components/CheckoutModal';
 import { Trash2, Plus, Minus } from 'lucide-react';
 import { redirectToCheckout } from '@/lib/stripe';
 
@@ -15,8 +16,9 @@ export default function CartPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!user) {
       alert('Debes iniciar sesión para continuar con la compra');
       router.push('/login');
@@ -28,6 +30,10 @@ export default function CartPage() {
       return;
     }
 
+    setShowCheckoutModal(true);
+  };
+
+  const handleConfirmPayment = async () => {
     setLoading(true);
 
     try {
@@ -39,8 +45,8 @@ export default function CartPage() {
         },
         body: JSON.stringify({
           items: cart,
-          userId: user.uid,
-          userEmail: user.email,
+          userId: user?.uid,
+          userEmail: user?.email,
         }),
       });
 
@@ -57,6 +63,7 @@ export default function CartPage() {
       alert('Error al procesar el pago');
     } finally {
       setLoading(false);
+      setShowCheckoutModal(false);
     }
   };
 
@@ -192,6 +199,16 @@ export default function CartPage() {
         </div>
       </div>
       <Footer />
+
+      {/* Modal de Checkout */}
+      <CheckoutModal
+        isOpen={showCheckoutModal}
+        onClose={() => setShowCheckoutModal(false)}
+        items={cart}
+        total={getCartTotal()}
+        onConfirmPayment={handleConfirmPayment}
+        loading={loading}
+      />
     </>
   );
 }

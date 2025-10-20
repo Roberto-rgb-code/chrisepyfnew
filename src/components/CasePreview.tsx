@@ -46,7 +46,13 @@ export default function CasePreview({ item, className = "w-24 h-48", showControl
                 scaleY(${item.imageControls.flipY})
                 translate(${item.imageControls.position.x}px, ${item.imageControls.position.y}px)
               `,
-              transformOrigin: 'center center'
+              transformOrigin: 'center center',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
             }}
           />
         </div>
