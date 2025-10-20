@@ -105,7 +105,7 @@ export default function Home() {
         colorURL: selectedModel.colorURL,
         maskURL: selectedModel.maskURL,
         customImage: userImageSrc,
-        price: 299,
+        price: 599,
         quantity: 1,
         imageControls: { ...imageControls }
       };

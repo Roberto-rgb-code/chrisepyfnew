@@ -203,7 +203,7 @@ function ModelCard({ model }: { model: PhoneModel }) {
         
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-blue-600">
-            $299 MXN
+            $599 MXN
           </span>
           <Link
             href={`/?model=${model.id}`}
@@ -249,7 +249,7 @@ function ModelListItem({ model }: { model: PhoneModel }) {
             
             <div className="flex items-center space-x-4">
               <span className="text-2xl font-bold text-blue-600">
-                $299 MXN
+                $599 MXN
               </span>
               <Link
                 href={`/?model=${model.id}`}

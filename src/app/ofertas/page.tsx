@@ -31,7 +31,7 @@ export default function OfertasPage() {
       title: 'Primera Compra',
       description: 'Descuento especial para nuevos clientes',
       discount: '15%',
-      originalPrice: 299,
+      originalPrice: 599,
       salePrice: 254,
       icon: <Star className="w-8 h-8" />,
       color: 'from-yellow-500 to-orange-600',
@@ -43,7 +43,7 @@ export default function OfertasPage() {
       title: 'Oferta Relámpago',
       description: 'Solo por tiempo limitado - ¡No te la pierdas!',
       discount: '30%',
-      originalPrice: 299,
+      originalPrice: 599,
       salePrice: 209,
       icon: <Zap className="w-8 h-8" />,
       color: 'from-red-500 to-pink-600',
@@ -185,7 +185,7 @@ export default function OfertasPage() {
                       $254 MXN
                     </span>
                     <span className="text-sm text-gray-500 line-through">
-                      $299 MXN
+                      $599 MXN
                     </span>
                   </div>
                   
