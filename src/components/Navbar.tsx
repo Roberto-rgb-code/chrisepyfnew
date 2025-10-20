@@ -132,8 +132,28 @@ export default function Navbar() {
     />
   </header>
 
-      {/* Breadcrumb */}
+      {/* Navegación principal */}
       <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex items-center justify-center space-x-8 py-4">
+            <Link href="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              Inicio
+            </Link>
+            <Link href="/catalogo" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              Catálogo
+            </Link>
+            <Link href="/ofertas" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              Ofertas
+            </Link>
+            <Link href="/carrito" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              Carrito
+            </Link>
+          </nav>
+        </div>
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="bg-gray-50 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex text-sm text-gray-500">
             <Link href="/" className="hover:text-blue-600">Inicio</Link>
