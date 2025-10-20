@@ -9,6 +9,30 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # Esta estructura de datos es más robusta y fácil de manejar.
 products = [
     {
+      "id": "ip17promax_c002",
+      "modelName": "iPhone 17 Pro Max",
+      "colorURL": "https://img1.styletify.com/sysres/proimg/ip17promax_c002/color/Black.png",
+      "maskURL": "https://img1.styletify.com/sysres/proimg/ip17promax_c002/mask.png"
+    },
+    {
+      "id": "ip17pro_c002",
+      "modelName": "iPhone 17 Pro",
+      "colorURL": "https://img1.styletify.com/sysres/proimg/ip17pro_c002/color/Black.png",
+      "maskURL": "https://img1.styletify.com/sysres/proimg/ip17pro_c002/mask.png"
+    },
+    {
+      "id": "ip17air_c002",
+      "modelName": "iPhone 17 Air",
+      "colorURL": "https://img1.styletify.com/sysres/proimg/ip17air_c002/color/Black.png",
+      "maskURL": "https://img1.styletify.com/sysres/proimg/ip17air_c002/mask.png"
+    },
+    {
+      "id": "ip17_c002",
+      "modelName": "iPhone 17",
+      "colorURL": "https://img1.styletify.com/sysres/proimg/ip17_c002/color/Black.png",
+      "maskURL": "https://img1.styletify.com/sysres/proimg/ip17_c002/mask.png"
+    },
+    {
       "id": "ip16pro_c002",
       "modelName": "iPhone 16 Pro",
       "colorURL": "https://img1.styletify.com/sysres/proimg/ip16pro_c002/color/Black.png",

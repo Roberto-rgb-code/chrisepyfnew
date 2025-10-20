@@ -71,9 +71,9 @@ export const phoneData: PhoneModel[] = [
   { "id": "a90", "modelName": "Samsung Galaxy A90", "colorURL": "/downloaded_images/a90_c002_color.png", "maskURL": "/downloaded_images/a90_c002_mask.png", "brand": "Samsung" },
   { "id": "a825g", "modelName": "Samsung Galaxy A82 5G", "colorURL": "/downloaded_images/a825g_c002_color.png", "maskURL": "/downloaded_images/a825g_c002_mask.png", "brand": "Samsung" },
   { "id": "a81", "modelName": "Samsung Galaxy A81", "colorURL": "/downloaded_images/a81_c002_color.png", "maskURL": "/downloaded_images/a81_c002_mask.png", "brand": "Samsung" },
-  { "id": "ip17", "modelName": "iPhone 17", "colorURL": "https://img1.styletify.com/sysres/proimg/ip17_c002/color/Black.png", "maskURL": "https://img1.styletify.com/sysres/proimg/ip17_c002/mask.png", "brand": "Apple" },
-  { "id": "ip17air", "modelName": "iPhone 17 Air", "colorURL": "https://img1.styletify.com/sysres/proimg/ip17air_c002/color/Black.png", "maskURL": "https://img1.styletify.com/sysres/proimg/ip17air_c002/mask.png", "brand": "Apple" },
-  { "id": "ip17pro", "modelName": "iPhone 17 Pro", "colorURL": "https://img1.styletify.com/sysres/proimg/ip17pro_c002/color/Black.png", "maskURL": "https://img1.styletify.com/sysres/proimg/ip17pro_c002/mask.png", "brand": "Apple" },
-  { "id": "ip17promax", "modelName": "iPhone 17 Pro Max", "colorURL": "https://img1.styletify.com/sysres/proimg/ip17promax_c002/color/Black.png", "maskURL": "https://img1.styletify.com/sysres/proimg/ip17promax_c002/mask.png", "brand": "Apple" }
+  { "id": "ip17", "modelName": "iPhone 17", "colorURL": "/downloaded_images/ip17_c002_color.png", "maskURL": "/downloaded_images/ip17_c002_mask.png", "brand": "Apple" },
+  { "id": "ip17air", "modelName": "iPhone 17 Air", "colorURL": "/downloaded_images/ip17air_c002_color.png", "maskURL": "/downloaded_images/ip17air_c002_mask.png", "brand": "Apple" },
+  { "id": "ip17pro", "modelName": "iPhone 17 Pro", "colorURL": "/downloaded_images/ip17pro_c002_color.png", "maskURL": "/downloaded_images/ip17pro_c002_mask.png", "brand": "Apple" },
+  { "id": "ip17promax", "modelName": "iPhone 17 Pro Max", "colorURL": "/downloaded_images/ip17promax_c002_color.png", "maskURL": "/downloaded_images/ip17promax_c002_mask.png", "brand": "Apple" }
 ];
 
