@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { generateCaseImage } from '@/lib/generateCaseImage';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -14,24 +15,42 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear line items para Stripe
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: 'mxn',
-        product_data: {
-          name: `Funda Personalizada - ${item.modelName}`,
-          description: item.customImage ? 'Con diseño personalizado' : 'Funda sin personalizar',
-          images: item.customImage 
-            ? [item.customImage] 
-            : [`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`],
-          metadata: {
-            productId: item.id,
-            modelName: item.modelName,
-            customImageUrl: item.customImage || '',
+    const lineItems = await Promise.all(items.map(async (item: any) => {
+      let productImage = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`;
+      
+      // Si hay imagen personalizada, generar imagen pre-renderizada
+      if (item.customImage && item.imageControls) {
+        try {
+          const renderedImage = await generateCaseImage(
+            `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`,
+            `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.maskURL}`,
+            item.customImage,
+            item.imageControls
+          );
+          productImage = renderedImage;
+        } catch (error) {
+          console.error('Error generando imagen personalizada:', error);
+          // Usar imagen base si falla la generación
+        }
+      }
+
+      return {
+        price_data: {
+          currency: 'mxn',
+          product_data: {
+            name: `Funda Personalizada - ${item.modelName}`,
+            description: item.customImage ? 'Con diseño personalizado' : 'Funda sin personalizar',
+            images: [productImage],
+            metadata: {
+              productId: item.id,
+              modelName: item.modelName,
+              customImageUrl: item.customImage || '',
+            },
           },
+          unit_amount: Math.round(item.price * 100),
         },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.quantity,
+        quantity: item.quantity,
+      };
     }));
 
     // Crear sesión de Stripe Checkout

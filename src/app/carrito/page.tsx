@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CasePreview from '@/components/CasePreview';
 import { Trash2, Plus, Minus } from 'lucide-react';
 import { redirectToCheckout } from '@/lib/stripe';
 
@@ -92,35 +93,12 @@ export default function CartPage() {
             {cart.map((item) => (
               <div key={item.id} className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center space-x-4">
-                  {/* Preview de la funda */}
-                  <div className="relative w-24 h-48 flex-shrink-0">
-                    <img
-                      src={item.colorURL}
-                      alt={item.modelName}
-                      className="w-full h-full object-contain"
-                    />
-                    {item.customImage && (
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          maskImage: `url(${item.maskURL})`,
-                          WebkitMaskImage: `url(${item.maskURL})`,
-                          maskSize: 'contain',
-                          WebkitMaskSize: 'contain',
-                          maskRepeat: 'no-repeat',
-                          WebkitMaskRepeat: 'no-repeat',
-                          maskPosition: 'center',
-                          WebkitMaskPosition: 'center',
-                        }}
-                      >
-                        <img
-                          src={item.customImage}
-                          alt="Custom"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {/* Preview de la funda personalizada */}
+                  <CasePreview 
+                    item={item} 
+                    className="w-24 h-48" 
+                    showControls={true}
+                  />
 
                   {/* Detalles */}
                   <div className="flex-1">
