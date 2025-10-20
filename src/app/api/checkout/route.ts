@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
         product_data: {
           name: `Funda Personalizada - ${item.modelName}`,
           description: item.customImage ? 'Con diseño personalizado' : 'Funda sin personalizar',
-          images: item.customImage ? [item.customImage] : [item.colorURL],
+          images: item.customImage 
+            ? [item.customImage] 
+            : [`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`],
           metadata: {
             productId: item.id,
             modelName: item.modelName,
