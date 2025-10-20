@@ -7,6 +7,7 @@ import CaseCustomizer, { ImageControls } from '@/components/CaseCustomizer';
 import AuthModal from '@/components/AuthModal';
 import CartSuccessModal from '@/components/CartSuccessModal';
 import ImageWarningModal from '@/components/ImageWarningModal';
+import ImageUploadSuccessModal from '@/components/ImageUploadSuccessModal';
 import { phoneData, PhoneModel } from '@/data/phoneData';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,9 +26,10 @@ export default function Home() {
     flipY: 1,
     position: { x: 0, y: 0 }
   });
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showCartSuccess, setShowCartSuccess] = useState(false);
-  const [showImageWarning, setShowImageWarning] = useState(false);
+         const [showAuthModal, setShowAuthModal] = useState(false);
+         const [showCartSuccess, setShowCartSuccess] = useState(false);
+         const [showImageWarning, setShowImageWarning] = useState(false);
+         const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
 
   const { addToCart } = useCart();
   const auth = useAuth();
@@ -78,14 +80,14 @@ export default function Home() {
       if (uploadResult.success && uploadResult.url) {
         console.log('✅ Imagen subida exitosamente:', uploadResult.url);
         setUserImageSrc(uploadResult.url);
-        setImageControls({
-          scale: 1,
-          rotation: 0,
-          flipX: 1,
-          flipY: 1,
-          position: { x: 0, y: 0 }
-        });
-        alert('¡Imagen subida exitosamente!');
+               setImageControls({
+                 scale: 1,
+                 rotation: 0,
+                 flipX: 1,
+                 flipY: 1,
+                 position: { x: 0, y: 0 }
+               });
+               setShowImageUploadSuccess(true);
       } else {
         console.error('❌ Error subiendo imagen:', uploadResult.error);
         alert(`Error al subir la imagen: ${uploadResult.error}`);
@@ -202,12 +204,18 @@ export default function Home() {
         onContinueShopping={handleContinueShopping}
       />
 
-      {/* Modal de advertencia de imagen */}
-      <ImageWarningModal
-        isOpen={showImageWarning}
-        onClose={() => setShowImageWarning(false)}
-      />
-    </>
-  );
-}
+             {/* Modal de advertencia de imagen */}
+             <ImageWarningModal
+               isOpen={showImageWarning}
+               onClose={() => setShowImageWarning(false)}
+             />
+
+             {/* Modal de éxito de subida de imagen */}
+             <ImageUploadSuccessModal
+               isOpen={showImageUploadSuccess}
+               onClose={() => setShowImageUploadSuccess(false)}
+             />
+           </>
+         );
+       }
 
