@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { PhoneModel } from '@/data/phoneData';
+import { useAuth } from './AuthContext';
 
 export interface ImageControls {
   scale: number;
@@ -40,28 +41,33 @@ export function useCart() {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const { user } = useAuth();
 
-  // Cargar carrito del localStorage
+  // Cargar carrito del localStorage (específico por usuario)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedCart = localStorage.getItem('cart');
+      const cartKey = user ? `cart_${user.uid}` : 'cart_guest';
+      const savedCart = localStorage.getItem(cartKey);
       if (savedCart) {
         try {
           setCart(JSON.parse(savedCart));
         } catch (error) {
           console.error('Error parsing cart from localStorage:', error);
-          localStorage.removeItem('cart');
+          localStorage.removeItem(cartKey);
         }
+      } else {
+        setCart([]); // Limpiar carrito si no hay datos para este usuario
       }
     }
-  }, []);
+  }, [user]);
 
-  // Guardar carrito en localStorage
+  // Guardar carrito en localStorage (específico por usuario)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('cart', JSON.stringify(cart));
+      const cartKey = user ? `cart_${user.uid}` : 'cart_guest';
+      localStorage.setItem(cartKey, JSON.stringify(cart));
     }
-  }, [cart]);
+  }, [cart, user]);
 
   const addToCart = (item: CartItem) => {
     try {
@@ -97,6 +103,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => {
     setCart([]);
+    // Limpiar también del localStorage
+    if (typeof window !== 'undefined') {
+      const cartKey = user ? `cart_${user.uid}` : 'cart_guest';
+      localStorage.removeItem(cartKey);
+    }
   };
 
   const getCartTotal = () => {

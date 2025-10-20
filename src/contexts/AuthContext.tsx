@@ -61,6 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (!auth) throw new Error('Auth not initialized');
     await signOut(auth);
+    // Redirigir al inicio después de cerrar sesión
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   };
 
   const resetPassword = async (email: string) => {
