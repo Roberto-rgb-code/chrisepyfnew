@@ -350,7 +350,7 @@ export default function CaseCustomizer({
       {/* Sidebar Derecho */}
       <div className="sidebar-right fade-in">
         <div className="price-section">
-          <div className="price-amount">$299 MXN</div>
+          <div className="price-amount">$599 MXN</div>
           <div className="price-subtitle">Envío gratis incluido</div>
         </div>
 

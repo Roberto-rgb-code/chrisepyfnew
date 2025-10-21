@@ -18,12 +18,12 @@ export async function POST(request: NextRequest) {
       id: 'TEST-' + Date.now(),
       customerName: 'Cliente de Prueba',
       customerEmail: email,
-      total: 299,
+      total: 599,
       items: [
         {
           modelName: 'iPhone 17 Pro Max',
           quantity: 1,
-          price: 299
+          price: 599
         }
       ],
       status: 'confirmed',

@@ -237,7 +237,7 @@ const phoneData = [
       colorURL: selectedModel.colorURL,
       maskURL: selectedModel.maskURL,
       customImage: userImageSrc,
-      price: 299, // 299 MXN
+      price: 599, // 599 MXN
       quantity: 1,
       imageControls: { ...imageControls },
       clientData
