@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -37,7 +39,39 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Crear sesión de Stripe Checkout
+    // Guardar información completa del carrito en Firestore ANTES del checkout
+    // Esto nos permite tener toda la info disponible para el webhook sin pasar por metadata de Stripe
+    let cartId = null;
+    if (db) {
+      try {
+        const cartData = {
+          userId,
+          userEmail,
+          items: items.map((item: any) => ({
+            id: item.id,
+            modelName: item.modelName,
+            modelId: item.modelId || item.id.split('-')[0],
+            quantity: item.quantity,
+            price: item.price,
+            colorURL: item.colorURL || '',
+            maskURL: item.maskURL || '',
+            customImage: item.customImage || null,
+            imageControls: item.imageControls || null,
+          })),
+          status: 'pending_checkout',
+          createdAt: serverTimestamp(),
+        };
+        
+        const docRef = await addDoc(collection(db, 'carts'), cartData);
+        cartId = docRef.id;
+        console.log('✅ Carrito guardado en Firestore:', cartId);
+      } catch (error) {
+        console.error('❌ Error guardando carrito:', error);
+        // Continuar con el checkout aunque falle guardar el carrito
+      }
+    }
+
+    // Crear sesión de Stripe Checkout con metadata mínima
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -46,31 +80,9 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/carrito`,
       customer_email: userEmail,
       metadata: {
-        userId,
-        userEmail: userEmail,
-        items: JSON.stringify(items.map((item: any) => ({
-          id: item.id,
-          modelName: item.modelName,
-          modelId: item.modelId || item.id.split('-')[0],
-          quantity: item.quantity,
-          price: item.price,
-          colorURL: item.colorURL || '',
-          maskURL: item.maskURL || '',
-          customImage: item.customImage || '',
-          imageControls: item.imageControls || null,
-        }))),
-        customImages: JSON.stringify(items.reduce((acc: any, item: any) => {
-          if (item.customImage) {
-            acc[item.id] = {
-              imageUrl: item.customImage,
-              imageControls: item.imageControls || null,
-              modelName: item.modelName,
-              colorURL: item.colorURL || '',
-              maskURL: item.maskURL || '',
-            };
-          }
-          return acc;
-        }, {})),
+        userId: userId || '',
+        cartId: cartId || '',
+        itemCount: items.length.toString(),
       },
     });
 

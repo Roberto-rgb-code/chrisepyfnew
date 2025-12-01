@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { resend } from '@/lib/resend';
 import { emailTemplates } from '@/lib/email-templates';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -58,35 +58,53 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       return;
     }
 
-    // Parsear items y customImages
-    const items = metadata?.items ? JSON.parse(metadata.items) : [];
-    const customImages = metadata?.customImages ? JSON.parse(metadata.customImages) : {};
+    // Intentar recuperar información completa del carrito desde Firestore usando cartId
+    let completeItems: any[] = [];
+    let cartData: any = null;
 
-    // Preparar items completos con toda la información
-    const completeItems = items.map((item: any) => {
-      const customImageData = customImages[item.id];
-      return {
-        id: item.id,
-        modelId: item.modelId || item.id.split('-')[0],
-        modelName: item.modelName,
-        quantity: item.quantity,
-        price: item.price,
-        colorURL: item.colorURL || '',
-        maskURL: item.maskURL || '',
-        customImage: item.customImage || customImageData?.imageUrl || null,
-        imageControls: item.imageControls || customImageData?.imageControls || null,
-        // Información completa para el jefe
-        designInfo: customImageData ? {
-          imageUrl: customImageData.imageUrl,
-          imageControls: customImageData.imageControls,
-          scale: customImageData.imageControls?.scale || 1,
-          rotation: customImageData.imageControls?.rotation || 0,
-          flipX: customImageData.imageControls?.flipX || 1,
-          flipY: customImageData.imageControls?.flipY || 1,
-          position: customImageData.imageControls?.position || { x: 0, y: 0 },
-        } : null,
-      };
-    });
+    if (metadata?.cartId && db) {
+      try {
+        const cartDocRef = doc(db, 'carts', metadata.cartId);
+        const cartDoc = await getDoc(cartDocRef);
+        
+        if (cartDoc.exists()) {
+          cartData = cartDoc.data();
+          completeItems = cartData.items || [];
+          console.log('✅ Carrito recuperado desde Firestore:', metadata.cartId);
+          console.log('📦 Items encontrados:', completeItems.length);
+        } else {
+          console.warn('⚠️ Carrito no encontrado en Firestore:', metadata.cartId);
+        }
+      } catch (error) {
+        console.error('❌ Error recuperando carrito desde Firestore:', error);
+      }
+    }
+
+    // Si no se pudo recuperar desde Firestore, intentar parsear desde metadata (fallback)
+    if (completeItems.length === 0 && metadata?.items) {
+      try {
+        const items = JSON.parse(metadata.items);
+        completeItems = items.map((item: any) => ({
+          id: item.id,
+          modelId: item.modelId || item.id.split('-')[0],
+          modelName: item.modelName,
+          quantity: item.quantity,
+          price: item.price,
+          colorURL: item.colorURL || '',
+          maskURL: item.maskURL || '',
+          customImage: item.customImage || null,
+          imageControls: item.imageControls || null,
+        }));
+        console.log('⚠️ Usando datos de metadata como fallback');
+      } catch (error) {
+        console.error('❌ Error parseando items desde metadata:', error);
+      }
+    }
+
+    if (completeItems.length === 0) {
+      console.error('❌ No se pudieron obtener items para la orden');
+      return;
+    }
 
     // Crear datos del pedido
     const orderData = {
@@ -111,13 +129,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           paymentStatus: session.payment_status,
           amountTotal: (session.amount_total || 0) / 100,
           currency: session.currency || 'mxn',
-          // Items completos con toda la información
+          // Items completos con toda la información (incluyendo customImage e imageControls)
           items: completeItems,
-          // Imágenes personalizadas con controles
-          customDesigns: customImages,
           // Información adicional para el jefe
-          hasCustomDesigns: Object.keys(customImages).length > 0,
+          hasCustomDesigns: completeItems.some((item: any) => item.customImage),
           totalItems: completeItems.length,
+          // Referencia al carrito original
+          cartId: metadata?.cartId || null,
           // Timestamps
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -125,7 +143,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         });
         console.log('✅ Orden guardada en Firestore con toda la información:', session.id);
         console.log('📦 Items guardados:', completeItems.length);
-        console.log('🖼️ Diseños personalizados:', Object.keys(customImages).length);
+        console.log('🖼️ Diseños personalizados:', completeItems.filter((item: any) => item.customImage).length);
       } catch (firestoreError) {
         console.error('❌ Error guardando en Firestore:', firestoreError);
       }
