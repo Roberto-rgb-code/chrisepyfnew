@@ -7,6 +7,9 @@ body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  margin: 0;
+  padding: 0;
 }
 
 /* Contenedor principal optimizado */
@@ -35,6 +38,7 @@ body {
 /* Área de preview central */
 .case-preview {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background: white;
@@ -64,7 +68,7 @@ body {
   cursor: grabbing;
 }
 
-/* Imagen base del modelo */
+/* Imagen base del modelo - DEBAJO de la imagen personalizada */
 .base-image {
   position: absolute;
   top: 50%;
@@ -79,7 +83,7 @@ body {
   pointer-events: none;
 }
 
-/* Contenedor de imagen personalizada */
+/* Contenedor de imagen personalizada - ENCIMA del modelo con máscara */
 .custom-image-container {
   position: absolute;
   top: 0;
@@ -97,6 +101,8 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
 /* Imagen personalizada */

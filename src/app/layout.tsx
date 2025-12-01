@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} bg-gray-50`}>
+      <body className={inter.className} style={{ backgroundColor: '#f8fafc', margin: 0, padding: 0 }}>
         <AuthProvider>
           <CartProvider>
             {children}

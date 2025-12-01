@@ -2,7 +2,6 @@ import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getAnalytics, Analytics } from "firebase/analytics";
 import { getFirestore, Firestore } from "firebase/firestore";
-import { getStorage, FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -19,22 +18,19 @@ let app: FirebaseApp | null;
 let auth: Auth | null;
 let db: Firestore | null;
 let analytics: Analytics | null;
-let storage: FirebaseStorage | null;
 
 if (typeof window !== 'undefined') {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   auth = getAuth(app);
   db = getFirestore(app);
   analytics = getAnalytics(app);
-  storage = getStorage(app);
 } else {
   // En el servidor, crear objetos vacíos
   app = null;
   auth = null;
   db = null;
   analytics = null;
-  storage = null;
 }
 
-export { app, auth, db, analytics, storage };
+export { app, auth, db, analytics };
 

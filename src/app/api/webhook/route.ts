@@ -62,37 +62,70 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const items = metadata?.items ? JSON.parse(metadata.items) : [];
     const customImages = metadata?.customImages ? JSON.parse(metadata.customImages) : {};
 
+    // Preparar items completos con toda la información
+    const completeItems = items.map((item: any) => {
+      const customImageData = customImages[item.id];
+      return {
+        id: item.id,
+        modelId: item.modelId || item.id.split('-')[0],
+        modelName: item.modelName,
+        quantity: item.quantity,
+        price: item.price,
+        colorURL: item.colorURL || '',
+        maskURL: item.maskURL || '',
+        customImage: item.customImage || customImageData?.imageUrl || null,
+        imageControls: item.imageControls || customImageData?.imageControls || null,
+        // Información completa para el jefe
+        designInfo: customImageData ? {
+          imageUrl: customImageData.imageUrl,
+          imageControls: customImageData.imageControls,
+          scale: customImageData.imageControls?.scale || 1,
+          rotation: customImageData.imageControls?.rotation || 0,
+          flipX: customImageData.imageControls?.flipX || 1,
+          flipY: customImageData.imageControls?.flipY || 1,
+          position: customImageData.imageControls?.position || { x: 0, y: 0 },
+        } : null,
+      };
+    });
+
     // Crear datos del pedido
     const orderData = {
       id: session.id,
       customerName: customer_email.split('@')[0], // Usar parte del email como nombre
       customerEmail: customer_email,
       total: (session.amount_total || 0) / 100, // Convertir de centavos
-      items: items.map((item: any) => ({
-        ...item,
-        customImage: customImages[item.id] || null
-      })),
+      items: completeItems,
       status: 'confirmed',
       date: new Date().toISOString(),
     };
 
-    // Guardar orden en Firestore
+    // Guardar orden en Firestore con TODA la información
     if (db) {
       try {
         await addDoc(collection(db, 'orders'), {
           orderId: session.id,
           userId: metadata?.userId || 'guest',
           customerEmail: customer_email,
+          customerName: customer_email.split('@')[0],
           status: 'confirmed',
           paymentStatus: session.payment_status,
           amountTotal: (session.amount_total || 0) / 100,
-          currency: session.currency,
+          currency: session.currency || 'mxn',
+          // Items completos con toda la información
+          items: completeItems,
+          // Imágenes personalizadas con controles
           customDesigns: customImages,
-          items: items,
+          // Información adicional para el jefe
+          hasCustomDesigns: Object.keys(customImages).length > 0,
+          totalItems: completeItems.length,
+          // Timestamps
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
+          orderDate: new Date().toISOString(),
         });
-        console.log('✅ Orden guardada en Firestore:', session.id);
+        console.log('✅ Orden guardada en Firestore con toda la información:', session.id);
+        console.log('📦 Items guardados:', completeItems.length);
+        console.log('🖼️ Diseños personalizados:', Object.keys(customImages).length);
       } catch (firestoreError) {
         console.error('❌ Error guardando en Firestore:', firestoreError);
       }

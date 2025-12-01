@@ -13,8 +13,6 @@ import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { uploadDesignImage } from '@/lib/uploadImage';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function Home() {
   const [selectedModel, setSelectedModel] = useState<PhoneModel>(phoneData.find(model => model.id === 'ip17promax') || phoneData[0]);
@@ -57,44 +55,51 @@ export default function Home() {
       return;
     }
 
-    if (!user) {
-      console.log('❌ Usuario no autenticado');
-      alert('Debes iniciar sesión para subir imágenes');
+    // Validar que sea una imagen
+    if (!file.type || !file.type.startsWith('image/')) {
+      alert('Por favor, selecciona un archivo de imagen válido (JPG, PNG, GIF, etc.)');
       return;
     }
 
-    console.log('✅ Usuario autenticado:', user.uid);
     console.log('📁 Archivo a subir:', {
       name: file.name,
       size: file.size,
       type: file.type
     });
 
+    if (user) {
+      console.log('✅ Usuario autenticado:', user.uid);
+    } else {
+      console.log('ℹ️ Usuario no autenticado - modo local (sin guardar en Firestore)');
+    }
+
     try {
-      // Subir imagen a Firebase Storage
-      console.log('🚀 Iniciando subida a Firebase Storage...');
-      const uploadResult = await uploadDesignImage(file, user.uid);
+      // Convertir imagen a base64 (localmente, sin guardar en Firestore)
+      console.log('🚀 Convirtiendo imagen a base64...');
+      const uploadResult = await uploadDesignImage(file, user?.uid);
       
       console.log('📤 Resultado de subida:', uploadResult);
       
       if (uploadResult.success && uploadResult.url) {
-        console.log('✅ Imagen subida exitosamente:', uploadResult.url);
+        console.log('✅ Imagen subida exitosamente:', uploadResult.url.substring(0, 50) + '...');
         setUserImageSrc(uploadResult.url);
-               setImageControls({
-                 scale: 1,
-                 rotation: 0,
-                 flipX: 1,
-                 flipY: 1,
-                 position: { x: 0, y: 0 }
-               });
-               setShowImageUploadSuccess(true);
+        setImageControls({
+          scale: 1,
+          rotation: 0,
+          flipX: 1,
+          flipY: 1,
+          position: { x: 0, y: 0 }
+        });
+        setShowImageUploadSuccess(true);
       } else {
-        console.error('❌ Error subiendo imagen:', uploadResult.error);
-        alert(`Error al subir la imagen: ${uploadResult.error}`);
+        const errorMessage = uploadResult.error || 'Error desconocido al subir la imagen';
+        console.error('❌ Error subiendo imagen:', errorMessage);
+        alert(`Error al subir la imagen: ${errorMessage}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('💥 Error en handleImageUpload:', error);
-      alert(`Error al subir la imagen: ${error}`);
+      const errorMessage = error?.message || error?.toString() || 'Error desconocido';
+      alert(`Error al subir la imagen: ${errorMessage}`);
     }
   };
 
@@ -111,6 +116,13 @@ export default function Home() {
 
   const handleAddToCart = async () => {
     try {
+      // Requerir login para agregar al carrito
+      if (!user) {
+        setShowAuthModal(true);
+        alert('Debes iniciar sesión para agregar productos al carrito');
+        return;
+      }
+
       if (!userImageSrc) {
         setShowImageWarning(true);
         return;
@@ -131,20 +143,30 @@ export default function Home() {
         addToCart(cartItem);
         setShowCartSuccess(true);
 
-        // Guardar la personalización en Firestore
-        if (user && db) {
+        // Guardar la personalización en Firestore (solo en cliente)
+        if (user && typeof window !== 'undefined') {
           try {
-            await addDoc(collection(db, 'personalizations'), {
-              userId: user.uid,
-              userEmail: user.email,
-              modelId: selectedModel.id,
-              modelName: selectedModel.modelName,
-              customImageUrl: userImageSrc,
-              imageControls: imageControls,
-              timestamp: serverTimestamp(),
-              status: 'added_to_cart'
-            });
-            console.log('Personalización guardada en Firestore');
+            // Import dinámico solo en el cliente
+            const firebaseModule = await import('@/lib/firebase');
+            const firestoreModule = await import('firebase/firestore');
+            
+            const db = firebaseModule.db;
+            if (db) {
+              await firestoreModule.addDoc(
+                firestoreModule.collection(db, 'personalizations'),
+                {
+                  userId: user.uid,
+                  userEmail: user.email,
+                  modelId: selectedModel.id,
+                  modelName: selectedModel.modelName,
+                  customImageUrl: userImageSrc,
+                  imageControls: imageControls,
+                  timestamp: firestoreModule.serverTimestamp(),
+                  status: 'added_to_cart'
+                }
+              );
+              console.log('Personalización guardada en Firestore');
+            }
           } catch (firestoreError) {
             console.error('Error guardando personalización en Firestore:', firestoreError);
           }

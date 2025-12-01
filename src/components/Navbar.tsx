@@ -38,7 +38,6 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/" className="nav-link active">Personalizar</Link>
               <Link href="/catalogo" className="nav-link">Catálogo</Link>
-              <Link href="/ofertas" className="nav-link">Ofertas</Link>
             </div>
 
             {/* Acciones del usuario */}

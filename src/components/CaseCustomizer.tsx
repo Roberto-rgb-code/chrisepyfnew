@@ -233,16 +233,16 @@ export default function CaseCustomizer({
     transformOrigin: 'center'
   };
 
-  const maskStyle = {
+  const maskStyle: React.CSSProperties = {
     maskImage: `url(${selectedModel.maskURL})`,
     WebkitMaskImage: `url(${selectedModel.maskURL})`,
-    maskSize: 'contain',
-    WebkitMaskSize: 'contain',
+    maskSize: '100% 100%',
+    WebkitMaskSize: '100% 100%',
     maskRepeat: 'no-repeat',
     WebkitMaskRepeat: 'no-repeat',
     maskPosition: 'center',
     WebkitMaskPosition: 'center'
-  };
+  } as React.CSSProperties;
 
   return (
     <div className="main-content">

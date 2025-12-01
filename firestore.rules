@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function para verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function para verificar si el usuario es el dueño del documento
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function para verificar si el usuario es admin
+    // Puedes agregar un campo 'role' en el documento del usuario en la colección 'users'
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Reglas para la colección de órdenes (orders)
+    match /orders/{orderId} {
+      // Permitir lectura solo al dueño de la orden o al admin
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Solo el servidor puede crear órdenes (a través del webhook)
+      // Los usuarios no pueden crear órdenes directamente
+      allow create: if false;
+      
+      // Solo el admin puede actualizar órdenes (para cambiar estado, etc.)
+      allow update: if isAdmin();
+      
+      // Nadie puede eliminar órdenes
+      allow delete: if false;
+    }
+    
+    // Reglas para la colección de personalizaciones (personalizations)
+    match /personalizations/{personalizationId} {
+      // El usuario solo puede leer sus propias personalizaciones
+      // El admin puede leer todas
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // El usuario solo puede crear sus propias personalizaciones
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // El usuario solo puede actualizar sus propias personalizaciones
+      // El admin puede actualizar cualquiera
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      
+      // El usuario solo puede eliminar sus propias personalizaciones
+      // El admin puede eliminar cualquiera
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // Reglas para la colección de usuarios (users)
+    match /users/{userId} {
+      // El usuario solo puede leer su propio perfil
+      // El admin puede leer todos los perfiles
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // El usuario puede crear su propio perfil
+      allow create: if isAuthenticated() && 
+                       request.resource.data.uid == request.auth.uid;
+      
+      // El usuario solo puede actualizar su propio perfil
+      // El admin puede actualizar cualquier perfil
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // Nadie puede eliminar perfiles (excepto admin si es necesario)
+      allow delete: if isAdmin();
+    }
+    
+    // Denegar acceso a todas las demás colecciones por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

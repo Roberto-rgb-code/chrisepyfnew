@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { generateCaseImage } from '@/lib/generateCaseImage';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -15,25 +14,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear line items para Stripe
-    const lineItems = await Promise.all(items.map(async (item: any) => {
-      let productImage = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`;
+    const lineItems = items.map((item: any) => {
+      // Usar la imagen base del teléfono para Stripe
+      // (Las imágenes base64 son muy grandes para Stripe)
+      const productImage = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`;
       
-      // Si hay imagen personalizada, generar imagen pre-renderizada
-      if (item.customImage && item.imageControls) {
-        try {
-          const renderedImage = await generateCaseImage(
-            `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`,
-            `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.maskURL}`,
-            item.customImage,
-            item.imageControls
-          );
-          productImage = renderedImage;
-        } catch (error) {
-          console.error('Error generando imagen personalizada:', error);
-          // Usar imagen base si falla la generación
-        }
-      }
-
       return {
         price_data: {
           currency: 'mxn',
@@ -44,14 +29,13 @@ export async function POST(request: NextRequest) {
             metadata: {
               productId: item.id,
               modelName: item.modelName,
-              customImageUrl: item.customImage || '',
             },
           },
           unit_amount: Math.round(item.price * 100),
         },
         quantity: item.quantity,
       };
-    }));
+    });
 
     // Crear sesión de Stripe Checkout
     const session = await stripe.checkout.sessions.create({
@@ -67,13 +51,23 @@ export async function POST(request: NextRequest) {
         items: JSON.stringify(items.map((item: any) => ({
           id: item.id,
           modelName: item.modelName,
+          modelId: item.modelId || item.id.split('-')[0],
           quantity: item.quantity,
           price: item.price,
+          colorURL: item.colorURL || '',
+          maskURL: item.maskURL || '',
           customImage: item.customImage || '',
+          imageControls: item.imageControls || null,
         }))),
         customImages: JSON.stringify(items.reduce((acc: any, item: any) => {
           if (item.customImage) {
-            acc[item.id] = item.customImage;
+            acc[item.id] = {
+              imageUrl: item.customImage,
+              imageControls: item.imageControls || null,
+              modelName: item.modelName,
+              colorURL: item.colorURL || '',
+              maskURL: item.maskURL || '',
+            };
           }
           return acc;
         }, {})),
