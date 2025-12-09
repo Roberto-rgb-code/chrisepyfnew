@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { Smartphone, Search, Heart, ShoppingCart, User, Menu } from 'lucide-react';
+import { Smartphone, Search, Heart, ShoppingCart, User, Menu, Shield } from 'lucide-react';
 import { useState } from 'react';
 import AuthModal from './AuthModal';
 import AnnouncementBar from './AnnouncementBar';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const { getCartCount } = useCart();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -79,6 +79,16 @@ export default function Navbar() {
                           </button>
                     {showUserMenu && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                        {isAdmin && (
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <Shield className="w-4 h-4" />
+                            Panel Admin
+                          </Link>
+                        )}
                         <Link
                           href="/perfil"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
