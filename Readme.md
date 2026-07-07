@@ -10,7 +10,7 @@ Aplicación Next.js 14 para personalización y venta de fundas de teléfono con 
 - ✅ **Carrito de Compras**: Sistema completo de carrito con persistencia
 - ✅ **Stripe Checkout**: Pasarela de pago segura integrada
 - ✅ **Responsive Design**: Optimizado para móviles, tablets y desktop
-- ✅ **Soporte de Teclado**: Atajos de teclado para edición rápida
+- ✅ **Panel de Administración**: Vista exclusiva para ver compras, movimientos y clientes
 
 ## 📋 Requisitos Previos
 
@@ -48,6 +48,9 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id_here
 # Stripe
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
 STRIPE_SECRET_KEY=your_stripe_secret_key_here
+
+# PostgreSQL (Railway)
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
 4. **Ejecutar en desarrollo**:
@@ -56,6 +59,38 @@ npm run dev
 ```
 
 La aplicación estará disponible en `http://localhost:3000`
+
+## 🔐 Credenciales de Administrador
+
+El panel admin está en `/admin` y solo es accesible para usuarios con rol `admin`.
+
+| Campo | Valor |
+|-------|-------|
+| **Email** | `admin@empaquesyfundas.com` |
+| **Contraseña** | `Admin123!` |
+| **URL del panel** | `/admin` |
+
+### Crear o sincronizar el admin
+
+```bash
+npm run seed:admin
+```
+
+También puedes usar la página `/setup-admin` una sola vez.
+
+### Qué puede ver el admin
+
+- **Compras** — Todas las órdenes con detalle de productos y diseños personalizados
+- **Movimientos** — Actividad de clientes: compras, carritos, personalizaciones y registros
+- **Clientes** — Listado con total gastado, compras y personalizaciones por usuario
+
+## 🧪 Tests
+
+```bash
+npm test
+```
+
+Ejecuta 18 tests que cubren: credenciales admin, validación Stripe, lógica de roles, flujos de carrito/órdenes y tipos de actividad.
 
 ## 📁 Estructura del Proyecto
 
@@ -165,6 +200,8 @@ npm run dev      # Modo desarrollo
 npm run build    # Construir para producción
 npm run start    # Iniciar servidor de producción
 npm run lint     # Ejecutar linter
+npm test         # Ejecutar tests Jest
+npm run seed:admin  # Crear/sincronizar usuario admin
 ```
 
 ## 🎨 Personalización

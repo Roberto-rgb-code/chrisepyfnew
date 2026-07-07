@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { ADMIN_EMAIL } from '@/lib/admin';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
   try {

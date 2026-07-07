@@ -11,6 +11,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 interface AuthContextType {
   user: User | null;
@@ -27,8 +28,6 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export function useAuth() {
   return useContext(AuthContext);
 }
-
-const ADMIN_EMAIL = 'admin@empaquesyfundas.com';
 
 async function syncUserWithDb(user: User): Promise<boolean> {
   try {

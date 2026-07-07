@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
-
-const ADMIN_EMAIL = 'admin@empaquesyfundas.com';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 export async function isUserAdmin(userId: string): Promise<boolean> {
   const user = await prisma.user.findUnique({

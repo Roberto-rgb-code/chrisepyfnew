@@ -5,8 +5,7 @@ import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
-const ADMIN_EMAIL = 'admin@empaquesyfundas.com';
-const ADMIN_PASSWORD = 'Admin123!';
+import { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_DISPLAY_NAME } from '@/lib/constants';
 
 async function syncAdminUser(uid: string, email: string, displayName: string) {
   await fetch('/api/users/sync', {
@@ -35,8 +34,8 @@ export default function SetupAdminPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD);
       const user = userCredential.user;
 
-      await updateProfile(user, { displayName: 'Admin' });
-      await syncAdminUser(user.uid, ADMIN_EMAIL, 'Admin');
+      await updateProfile(user, { displayName: ADMIN_DISPLAY_NAME });
+      await syncAdminUser(user.uid, ADMIN_EMAIL, ADMIN_DISPLAY_NAME);
 
       setStatus('✅ ¡Admin creado exitosamente!');
       setSuccess(true);
@@ -53,7 +52,7 @@ export default function SetupAdminPage() {
 
           const user = auth.currentUser;
           if (user) {
-            await syncAdminUser(user.uid, ADMIN_EMAIL, 'Admin');
+            await syncAdminUser(user.uid, ADMIN_EMAIL, ADMIN_DISPLAY_NAME);
           }
 
           setStatus('✅ ¡Sesión iniciada como admin!');

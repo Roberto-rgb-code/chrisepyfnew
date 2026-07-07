@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Smartphone } from 'lucide-react';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -22,7 +23,11 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push('/');
+      if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError('Error al iniciar sesión. Verifica tus credenciales.');
       console.error(err);

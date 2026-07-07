@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
@@ -28,7 +28,10 @@ import {
   RotateCw,
   FlipHorizontal,
   FlipVertical,
-  Move
+  Move,
+  Activity,
+  UserCircle,
+  ShoppingCart
 } from 'lucide-react';
 
 interface Order {
@@ -57,6 +60,31 @@ interface Stats {
   avgOrderValue: number;
 }
 
+interface ClientSummary {
+  id: string;
+  email: string;
+  displayName: string | null;
+  createdAt: string;
+  ordersCount: number;
+  personalizationsCount: number;
+  cartsCount: number;
+  totalSpent: number;
+}
+
+interface ActivityItem {
+  id: string;
+  type: 'order' | 'cart' | 'personalization' | 'user';
+  clientEmail: string;
+  clientName: string | null;
+  description: string;
+  amount: number | null;
+  status: string;
+  createdAt: string;
+  metadata: Record<string, unknown>;
+}
+
+type AdminTab = 'orders' | 'activity' | 'clients';
+
 export default function AdminPage() {
   const { user, loading, isAdmin } = useAuth();
   const router = useRouter();
@@ -75,6 +103,10 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<AdminTab>('orders');
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [clients, setClients] = useState<ClientSummary[]>([]);
+  const [activitySearch, setActivitySearch] = useState('');
 
   // Verificar si es admin
   useEffect(() => {
@@ -88,45 +120,53 @@ export default function AdminPage() {
   // Cargar datos
   useEffect(() => {
     if (isAdmin && user) {
-      loadOrders();
+      loadAllData();
     }
   }, [isAdmin, user]);
 
-  const loadOrders = async () => {
+  const loadAllData = async () => {
     if (!user) return;
-
     setLoadingData(true);
     try {
-      const response = await fetch(`/api/admin/orders?userId=${user.uid}`);
-      if (!response.ok) throw new Error('Failed to load orders');
+      const [ordersRes, activityRes] = await Promise.all([
+        fetch(`/api/admin/orders?userId=${user.uid}`),
+        fetch(`/api/admin/activity?userId=${user.uid}`),
+      ]);
 
-      const data = await response.json();
-      const ordersData: Order[] = data.orders || [];
-      
-      setOrders(ordersData);
-      setFilteredOrders(ordersData);
-      
-      // Calcular estadísticas
-      const totalRevenue = ordersData.reduce((acc, order) => acc + (order.amountTotal || 0), 0);
-      const pendingOrders = ordersData.filter(o => o.status === 'confirmed' || o.status === 'processing').length;
-      const completedOrders = ordersData.filter(o => o.status === 'delivered').length;
-      const customDesigns = ordersData.filter(o => o.hasCustomDesigns).length;
-      
-      setStats({
-        totalOrders: ordersData.length,
-        totalRevenue,
-        pendingOrders,
-        completedOrders,
-        customDesigns,
-        avgOrderValue: ordersData.length > 0 ? totalRevenue / ordersData.length : 0
-      });
-      
+      if (ordersRes.ok) {
+        const data = await ordersRes.json();
+        const ordersData: Order[] = data.orders || [];
+        setOrders(ordersData);
+        setFilteredOrders(ordersData);
+
+        const totalRevenue = ordersData.reduce((acc, order) => acc + (order.amountTotal || 0), 0);
+        const pendingOrders = ordersData.filter(o => o.status === 'confirmed' || o.status === 'processing').length;
+        const completedOrders = ordersData.filter(o => o.status === 'delivered').length;
+        const customDesigns = ordersData.filter(o => o.hasCustomDesigns).length;
+
+        setStats({
+          totalOrders: ordersData.length,
+          totalRevenue,
+          pendingOrders,
+          completedOrders,
+          customDesigns,
+          avgOrderValue: ordersData.length > 0 ? totalRevenue / ordersData.length : 0
+        });
+      }
+
+      if (activityRes.ok) {
+        const activityData = await activityRes.json();
+        setActivities(activityData.activities || []);
+        setClients(activityData.clients || []);
+      }
     } catch (error) {
-      console.error('Error loading orders:', error);
+      console.error('Error loading admin data:', error);
     } finally {
       setLoadingData(false);
     }
   };
+
+  const loadOrders = loadAllData;
 
   // Filtrar órdenes
   useEffect(() => {
@@ -215,6 +255,37 @@ export default function AdminPage() {
     setExpandedOrders(newExpanded);
   };
 
+  const getActivityIcon = (type: ActivityItem['type']) => {
+    const icons = {
+      order: ShoppingBag,
+      cart: ShoppingCart,
+      personalization: ImageIcon,
+      user: UserCircle,
+    };
+    const Icon = icons[type];
+    return <Icon className="w-4 h-4" />;
+  };
+
+  const getActivityLabel = (type: ActivityItem['type']) => {
+    const labels = {
+      order: 'Compra',
+      cart: 'Carrito',
+      personalization: 'Personalización',
+      user: 'Registro',
+    };
+    return labels[type];
+  };
+
+  const filteredActivities = activities.filter((activity) => {
+    if (!activitySearch) return true;
+    const term = activitySearch.toLowerCase();
+    return (
+      activity.clientEmail.toLowerCase().includes(term) ||
+      activity.description.toLowerCase().includes(term) ||
+      activity.type.toLowerCase().includes(term)
+    );
+  });
+
   const formatDate = (dateString: string | any) => {
     if (!dateString) return 'N/A';
     try {
@@ -257,7 +328,29 @@ export default function AdminPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">🛠️ Panel de Administración</h1>
-            <p className="text-gray-600 mt-2">Gestiona todas las órdenes y visualiza estadísticas</p>
+            <p className="text-gray-600 mt-2">Compras, movimientos y actividad de todos los clientes</p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {[
+              { id: 'orders' as const, label: 'Compras', icon: ShoppingBag },
+              { id: 'activity' as const, label: 'Movimientos', icon: Activity },
+              { id: 'clients' as const, label: 'Clientes', icon: Users },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Stats Cards */}
@@ -335,7 +428,8 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Filters */}
+          {/* Filters - Orders tab */}
+          {activeTab === 'orders' && (
           <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex items-center gap-4 w-full md:w-auto">
@@ -373,8 +467,10 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+          )}
 
           {/* Orders Table */}
+          {activeTab === 'orders' && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -412,8 +508,8 @@ export default function AdminPage() {
                     </tr>
                   ) : (
                     filteredOrders.map((order) => (
-                      <>
-                        <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                      <Fragment key={order.id}>
+                        <tr className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <button
@@ -702,17 +798,135 @@ export default function AdminPage() {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </Fragment>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
           </div>
+          )}
+
+          {/* Activity / Movimientos */}
+          {activeTab === 'activity' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar movimientos..."
+                    value={activitySearch}
+                    onChange={(e) => setActivitySearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Tipo</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Cliente</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Descripción</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Monto</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {filteredActivities.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                          No hay movimientos registrados
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredActivities.map((activity) => (
+                        <tr key={`${activity.type}-${activity.id}`} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {getActivityIcon(activity.type)}
+                              {getActivityLabel(activity.type)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="font-medium text-gray-900">{activity.clientName || '—'}</p>
+                            <p className="text-sm text-gray-500">{activity.clientEmail}</p>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">{activity.description}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-green-600">
+                            {activity.amount != null ? `$${activity.amount.toFixed(2)} MXN` : '—'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 capitalize">
+                              {activity.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500">
+                            {formatDate(activity.createdAt)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Clients */}
+          {activeTab === 'clients' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Cliente</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Compras</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Personalizaciones</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Carritos</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Total gastado</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Registro</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {clients.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                          No hay clientes registrados
+                        </td>
+                      </tr>
+                    ) : (
+                      clients.map((client) => (
+                        <tr key={client.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <p className="font-medium text-gray-900">{client.displayName || 'Sin nombre'}</p>
+                            <p className="text-sm text-gray-500">{client.email}</p>
+                          </td>
+                          <td className="px-6 py-4 text-sm">{client.ordersCount}</td>
+                          <td className="px-6 py-4 text-sm">{client.personalizationsCount}</td>
+                          <td className="px-6 py-4 text-sm">{client.cartsCount}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-green-600">
+                            ${client.totalSpent.toFixed(2)} MXN
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500">
+                            {formatDate(client.createdAt)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Footer info */}
           <div className="mt-6 text-center text-sm text-gray-500">
-            Mostrando {filteredOrders.length} de {orders.length} órdenes
+            {activeTab === 'orders' && `Mostrando ${filteredOrders.length} de ${orders.length} órdenes`}
+            {activeTab === 'activity' && `Mostrando ${filteredActivities.length} de ${activities.length} movimientos`}
+            {activeTab === 'clients' && `${clients.length} clientes registrados`}
           </div>
         </div>
       </div>
