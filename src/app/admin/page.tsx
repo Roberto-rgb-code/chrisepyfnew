@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, doc, updateDoc, where } from 'firebase/firestore';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { 
@@ -89,30 +87,21 @@ export default function AdminPage() {
 
   // Cargar datos
   useEffect(() => {
-    if (isAdmin && db) {
+    if (isAdmin && user) {
       loadOrders();
     }
-  }, [isAdmin]);
+  }, [isAdmin, user]);
 
   const loadOrders = async () => {
-    if (!db) return;
-    
+    if (!user) return;
+
     setLoadingData(true);
     try {
-      const ordersQuery = query(
-        collection(db, 'orders'),
-        orderBy('createdAt', 'desc')
-      );
-      
-      const snapshot = await getDocs(ordersQuery);
-      const ordersData: Order[] = [];
-      
-      snapshot.forEach((doc) => {
-        ordersData.push({
-          id: doc.id,
-          ...doc.data()
-        } as Order);
-      });
+      const response = await fetch(`/api/admin/orders?userId=${user.uid}`);
+      if (!response.ok) throw new Error('Failed to load orders');
+
+      const data = await response.json();
+      const ordersData: Order[] = data.orders || [];
       
       setOrders(ordersData);
       setFilteredOrders(ordersData);
@@ -159,14 +148,16 @@ export default function AdminPage() {
   }, [searchTerm, statusFilter, orders]);
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    if (!db) return;
-    
+    if (!user) return;
+
     try {
-      const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, {
-        status: newStatus,
-        updatedAt: new Date().toISOString()
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.uid, status: newStatus }),
       });
+
+      if (!response.ok) throw new Error('Failed to update order');
       
       // Actualizar estado local
       setOrders(orders.map(order => 

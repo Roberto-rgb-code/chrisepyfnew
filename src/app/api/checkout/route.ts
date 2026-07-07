@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { prisma } from '@/lib/prisma';
+import { validateStripeKeys } from '@/lib/stripe-config';
+
+validateStripeKeys();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -15,12 +17,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No items provided' }, { status: 400 });
     }
 
-    // Crear line items para Stripe
     const lineItems = items.map((item: any) => {
-      // Usar la imagen base del teléfono para Stripe
-      // (Las imágenes base64 son muy grandes para Stripe)
       const productImage = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`;
-      
+
       return {
         price_data: {
           currency: 'mxn',
@@ -39,39 +38,36 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Guardar información completa del carrito en Firestore ANTES del checkout
-    // Esto nos permite tener toda la info disponible para el webhook sin pasar por metadata de Stripe
-    let cartId = null;
-    if (db) {
-      try {
-        const cartData = {
-          userId,
+    let cartId: string | null = null;
+
+    try {
+      const cartItems = items.map((item: any) => ({
+        id: item.id,
+        modelName: item.modelName,
+        modelId: item.modelId || item.id.split('-')[0],
+        quantity: item.quantity,
+        price: item.price,
+        colorURL: item.colorURL || '',
+        maskURL: item.maskURL || '',
+        customImage: item.customImage || null,
+        imageControls: item.imageControls || null,
+      }));
+
+      const cart = await prisma.cart.create({
+        data: {
+          userId: userId || null,
           userEmail,
-          items: items.map((item: any) => ({
-            id: item.id,
-            modelName: item.modelName,
-            modelId: item.modelId || item.id.split('-')[0],
-            quantity: item.quantity,
-            price: item.price,
-            colorURL: item.colorURL || '',
-            maskURL: item.maskURL || '',
-            customImage: item.customImage || null,
-            imageControls: item.imageControls || null,
-          })),
+          items: cartItems,
           status: 'pending_checkout',
-          createdAt: serverTimestamp(),
-        };
-        
-        const docRef = await addDoc(collection(db, 'carts'), cartData);
-        cartId = docRef.id;
-        console.log('✅ Carrito guardado en Firestore:', cartId);
-      } catch (error) {
-        console.error('❌ Error guardando carrito:', error);
-        // Continuar con el checkout aunque falle guardar el carrito
-      }
+        },
+      });
+
+      cartId = cart.id;
+      console.log('✅ Carrito guardado en PostgreSQL:', cartId);
+    } catch (error) {
+      console.error('❌ Error guardando carrito:', error);
     }
 
-    // Crear sesión de Stripe Checkout con metadata mínima
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -86,9 +82,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       url: session.url,
-      sessionId: session.id 
+      sessionId: session.id,
     });
   } catch (error: any) {
     console.error('Stripe error:', error);
@@ -98,4 +94,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

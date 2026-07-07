@@ -10,8 +10,7 @@ import {
   sendPasswordResetEmail,
   updateProfile
 } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -29,8 +28,29 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-// Email del administrador
 const ADMIN_EMAIL = 'admin@empaquesyfundas.com';
+
+async function syncUserWithDb(user: User): Promise<boolean> {
+  try {
+    const response = await fetch('/api/users/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+      }),
+    });
+
+    if (!response.ok) return user.email === ADMIN_EMAIL;
+
+    const data = await response.json();
+    return data.isAdmin === true;
+  } catch (error) {
+    console.error('Error syncing user with database:', error);
+    return user.email === ADMIN_EMAIL;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -43,42 +63,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      
-      // Verificar si es admin
-      if (user && db) {
-        try {
-          // Primero verificar por email
-          if (user.email === ADMIN_EMAIL) {
-            setIsAdmin(true);
-            // Asegurar que el documento de usuario tenga el rol de admin
-            const userDocRef = doc(db, 'users', user.uid);
-            await setDoc(userDocRef, {
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName || 'Admin',
-              role: 'admin',
-              updatedAt: new Date().toISOString()
-            }, { merge: true });
-          } else {
-            // Verificar en Firestore
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists() && userDoc.data().role === 'admin') {
-              setIsAdmin(true);
-            } else {
-              setIsAdmin(false);
-            }
-          }
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-          setIsAdmin(false);
-        }
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      if (currentUser) {
+        const admin = await syncUserWithDb(currentUser);
+        setIsAdmin(admin);
       } else {
         setIsAdmin(false);
       }
-      
+
       setLoading(false);
     });
 
@@ -90,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     if (userCredential.user) {
       await updateProfile(userCredential.user, { displayName });
+      await syncUserWithDb(userCredential.user);
     }
   };
 
@@ -101,7 +96,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (!auth) throw new Error('Auth not initialized');
     await signOut(auth);
-    // Redirigir al inicio después de cerrar sesión
     if (typeof window !== 'undefined') {
       window.location.href = '/';
     }
@@ -128,4 +122,3 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
-

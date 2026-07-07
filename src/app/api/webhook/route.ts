@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { resend } from '@/lib/resend';
 import { emailTemplates } from '@/lib/email-templates';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { prisma } from '@/lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -25,16 +24,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Manejar diferentes tipos de eventos
     switch (event.type) {
       case 'checkout.session.completed':
         await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
         break;
-      
+
       case 'payment_intent.succeeded':
         await handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent);
         break;
-      
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }
@@ -42,45 +40,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (error: any) {
     console.error('Webhook error:', error);
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   try {
     const { customer_email, metadata } = session;
-    
+
     if (!customer_email) {
       console.error('No customer email found');
       return;
     }
 
-    // Intentar recuperar información completa del carrito desde Firestore usando cartId
     let completeItems: any[] = [];
-    let cartData: any = null;
+    let cartId: string | null = null;
 
-    if (metadata?.cartId && db) {
+    if (metadata?.cartId) {
       try {
-        const cartDocRef = doc(db, 'carts', metadata.cartId);
-        const cartDoc = await getDoc(cartDocRef);
-        
-        if (cartDoc.exists()) {
-          cartData = cartDoc.data();
-          completeItems = cartData.items || [];
-          console.log('✅ Carrito recuperado desde Firestore:', metadata.cartId);
-          console.log('📦 Items encontrados:', completeItems.length);
+        const cart = await prisma.cart.findUnique({
+          where: { id: metadata.cartId },
+        });
+
+        if (cart) {
+          completeItems = (cart.items as any[]) || [];
+          cartId = cart.id;
+          console.log('✅ Carrito recuperado desde PostgreSQL:', cartId);
         } else {
-          console.warn('⚠️ Carrito no encontrado en Firestore:', metadata.cartId);
+          console.warn('⚠️ Carrito no encontrado:', metadata.cartId);
         }
       } catch (error) {
-        console.error('❌ Error recuperando carrito desde Firestore:', error);
+        console.error('❌ Error recuperando carrito:', error);
       }
     }
 
-    // Si no se pudo recuperar desde Firestore, intentar parsear desde metadata (fallback)
     if (completeItems.length === 0 && metadata?.items) {
       try {
         const items = JSON.parse(metadata.items);
@@ -95,7 +88,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           customImage: item.customImage || null,
           imageControls: item.imageControls || null,
         }));
-        console.log('⚠️ Usando datos de metadata como fallback');
       } catch (error) {
         console.error('❌ Error parseando items desde metadata:', error);
       }
@@ -106,52 +98,59 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       return;
     }
 
-    // Crear datos del pedido
     const orderData = {
       id: session.id,
-      customerName: customer_email.split('@')[0], // Usar parte del email como nombre
+      customerName: customer_email.split('@')[0],
       customerEmail: customer_email,
-      total: (session.amount_total || 0) / 100, // Convertir de centavos
+      total: (session.amount_total || 0) / 100,
       items: completeItems,
       status: 'confirmed',
       date: new Date().toISOString(),
     };
 
-    // Guardar orden en Firestore con TODA la información
-    if (db) {
-      try {
-        await addDoc(collection(db, 'orders'), {
+    const userId = metadata?.userId && metadata.userId !== 'guest' ? metadata.userId : null;
+
+    try {
+      await prisma.order.upsert({
+        where: { orderId: session.id },
+        update: {
+          status: 'confirmed',
+          paymentStatus: session.payment_status,
+          amountTotal: (session.amount_total || 0) / 100,
+          items: completeItems,
+          hasCustomDesigns: completeItems.some((item: any) => item.customImage),
+          totalItems: completeItems.length,
+        },
+        create: {
           orderId: session.id,
-          userId: metadata?.userId || 'guest',
+          userId,
           customerEmail: customer_email,
           customerName: customer_email.split('@')[0],
           status: 'confirmed',
           paymentStatus: session.payment_status,
           amountTotal: (session.amount_total || 0) / 100,
           currency: session.currency || 'mxn',
-          // Items completos con toda la información (incluyendo customImage e imageControls)
           items: completeItems,
-          // Información adicional para el jefe
           hasCustomDesigns: completeItems.some((item: any) => item.customImage),
           totalItems: completeItems.length,
-          // Referencia al carrito original
-          cartId: metadata?.cartId || null,
-          // Timestamps
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          orderDate: new Date().toISOString(),
+          cartId,
+          orderDate: new Date(),
+        },
+      });
+
+      if (cartId) {
+        await prisma.cart.update({
+          where: { id: cartId },
+          data: { status: 'completed' },
         });
-        console.log('✅ Orden guardada en Firestore con toda la información:', session.id);
-        console.log('📦 Items guardados:', completeItems.length);
-        console.log('🖼️ Diseños personalizados:', completeItems.filter((item: any) => item.customImage).length);
-      } catch (firestoreError) {
-        console.error('❌ Error guardando en Firestore:', firestoreError);
       }
+
+      console.log('✅ Orden guardada en PostgreSQL:', session.id);
+    } catch (dbError) {
+      console.error('❌ Error guardando orden:', dbError);
     }
 
-    // Enviar email de confirmación
     await sendOrderEmail('order_confirmation', orderData, customer_email);
-    
     console.log(`Order confirmation email sent for session: ${session.id}`);
   } catch (error) {
     console.error('Error handling checkout completed:', error);
@@ -159,19 +158,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 }
 
 async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
-  try {
-    // Aquí podrías enviar un email de procesamiento
-    // Por ahora solo logueamos
-    console.log(`Payment succeeded: ${paymentIntent.id}`);
-  } catch (error) {
-    console.error('Error handling payment succeeded:', error);
-  }
+  console.log(`Payment succeeded: ${paymentIntent.id}`);
 }
 
 async function sendOrderEmail(type: string, orderData: any, customerEmail: string) {
   try {
     let emailTemplate;
-    
+
     switch (type) {
       case 'order_confirmation':
         emailTemplate = emailTemplates.orderConfirmation(orderData);

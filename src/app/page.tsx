@@ -143,32 +143,22 @@ export default function Home() {
         addToCart(cartItem);
         setShowCartSuccess(true);
 
-        // Guardar la personalización en Firestore (solo en cliente)
-        if (user && typeof window !== 'undefined') {
+        if (user) {
           try {
-            // Import dinámico solo en el cliente
-            const firebaseModule = await import('@/lib/firebase');
-            const firestoreModule = await import('firebase/firestore');
-            
-            const db = firebaseModule.db;
-            if (db) {
-              await firestoreModule.addDoc(
-                firestoreModule.collection(db, 'personalizations'),
-                {
-                  userId: user.uid,
-                  userEmail: user.email,
-                  modelId: selectedModel.id,
-                  modelName: selectedModel.modelName,
-                  customImageUrl: userImageSrc,
-                  imageControls: imageControls,
-                  timestamp: firestoreModule.serverTimestamp(),
-                  status: 'added_to_cart'
-                }
-              );
-              console.log('Personalización guardada en Firestore');
-            }
-          } catch (firestoreError) {
-            console.error('Error guardando personalización en Firestore:', firestoreError);
+            await fetch('/api/personalizations', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: user.uid,
+                userEmail: user.email,
+                modelId: selectedModel.id,
+                modelName: selectedModel.modelName,
+                customImageUrl: userImageSrc,
+                imageControls: imageControls,
+              }),
+            });
+          } catch (dbError) {
+            console.error('Error guardando personalización:', dbError);
           }
         }
       } else {

@@ -1,13 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { auth, db } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 const ADMIN_EMAIL = 'admin@empaquesyfundas.com';
 const ADMIN_PASSWORD = 'Admin123!';
+
+async function syncAdminUser(uid: string, email: string, displayName: string) {
+  await fetch('/api/users/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, email, displayName }),
+  });
+}
 
 export default function SetupAdminPage() {
   const [status, setStatus] = useState<string>('');
@@ -16,7 +23,7 @@ export default function SetupAdminPage() {
   const router = useRouter();
 
   const createAdmin = async () => {
-    if (!auth || !db) {
+    if (!auth) {
       setStatus('❌ Firebase no está inicializado');
       return;
     }
@@ -25,54 +32,33 @@ export default function SetupAdminPage() {
     setStatus('🔄 Creando cuenta de admin...');
 
     try {
-      // Intentar crear el usuario
       const userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD);
       const user = userCredential.user;
 
-      // Actualizar el perfil
       await updateProfile(user, { displayName: 'Admin' });
-
-      // Crear documento en Firestore con rol admin
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        email: ADMIN_EMAIL,
-        displayName: 'Admin',
-        role: 'admin',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+      await syncAdminUser(user.uid, ADMIN_EMAIL, 'Admin');
 
       setStatus('✅ ¡Admin creado exitosamente!');
       setSuccess(true);
 
-      // Redirigir al panel de admin después de 2 segundos
       setTimeout(() => {
         router.push('/admin');
       }, 2000);
-
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         setStatus('⚠️ La cuenta ya existe. Intentando iniciar sesión...');
-        
+
         try {
-          // Intentar login si ya existe
           await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD);
-          
-          // Asegurar que el documento tenga rol admin
+
           const user = auth.currentUser;
           if (user) {
-            await setDoc(doc(db, 'users', user.uid), {
-              uid: user.uid,
-              email: ADMIN_EMAIL,
-              displayName: 'Admin',
-              role: 'admin',
-              updatedAt: new Date().toISOString(),
-            }, { merge: true });
+            await syncAdminUser(user.uid, ADMIN_EMAIL, 'Admin');
           }
 
           setStatus('✅ ¡Sesión iniciada como admin!');
           setSuccess(true);
-          
+
           setTimeout(() => {
             router.push('/admin');
           }, 2000);
@@ -150,4 +136,3 @@ export default function SetupAdminPage() {
     </div>
   );
 }
-

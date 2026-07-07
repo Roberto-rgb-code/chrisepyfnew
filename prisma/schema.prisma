@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id
+  email       String   @unique
+  displayName String?
+  role        String   @default("user")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders           Order[]
+  carts            Cart[]
+  personalizations Personalization[]
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String?
+  userEmail String
+  items     Json
+  status    String   @default("pending_checkout")
+  createdAt DateTime @default(now())
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orders Order[]
+}
+
+model Order {
+  id               String   @id @default(cuid())
+  orderId          String   @unique
+  userId           String?
+  customerEmail    String
+  customerName     String?
+  status           String   @default("confirmed")
+  paymentStatus    String?
+  amountTotal      Float
+  currency         String   @default("mxn")
+  items            Json
+  hasCustomDesigns Boolean  @default(false)
+  totalItems       Int      @default(0)
+  cartId           String?
+  orderDate        DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  cart Cart? @relation(fields: [cartId], references: [id], onDelete: SetNull)
+}
+
+model Personalization {
+  id             String   @id @default(cuid())
+  userId         String
+  userEmail      String?
+  modelId        String
+  modelName      String
+  customImageUrl String   @db.Text
+  imageControls  Json?
+  status         String   @default("added_to_cart")
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
