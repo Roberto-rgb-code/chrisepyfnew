@@ -11,7 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, userId, userEmail } = await request.json();
+    const { items, userId, userEmail, customerName } = await request.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No items provided' }, { status: 400 });
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
         userId: userId || '',
         cartId: cartId || '',
         itemCount: items.length.toString(),
+        customerName: customerName || userEmail?.split('@')[0] || '',
       },
     });
 

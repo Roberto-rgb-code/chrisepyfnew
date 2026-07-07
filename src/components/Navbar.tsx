@@ -1,150 +1,150 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { Smartphone, Search, Heart, ShoppingCart, User, Menu, Shield } from 'lucide-react';
+import { Smartphone, Search, ShoppingCart, User, Menu, Shield, X } from 'lucide-react';
 import { useState } from 'react';
 import AuthModal from './AuthModal';
 import AnnouncementBar from './AnnouncementBar';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { user, logout, isAdmin } = useAuth();
   const { getCartCount } = useCart();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const navLinks = [
+    { href: '/', label: 'Personalizar' },
+    { href: '/catalogo', label: 'Catálogo' },
+    { href: '/carrito', label: 'Carrito' },
+  ];
+
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/catalogo?q=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
 
   return (
     <>
-      {/* Barra de promoción dinámica */}
       <AnnouncementBar />
-
-      {/* Navbar */}
       <header className="navbar">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo y marca */}
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Smartphone className="w-6 h-6 text-white" />
-                </div>
-                <span className="logo-text">Empaques & Fundas</span>
-              </Link>
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                <Smartphone className="w-6 h-6 text-white" />
+              </div>
+              <span className="logo-text hidden sm:inline">Empaques & Fundas</span>
+            </Link>
+
+            <div className="hidden md:flex items-center space-x-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`nav-link px-4 py-2 rounded-lg transition-colors ${isActive(link.href) ? 'active bg-blue-50 text-blue-700' : ''}`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
 
-            {/* Navegación principal */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="nav-link active">Personalizar</Link>
-              <Link href="/catalogo" className="nav-link">Catálogo</Link>
-            </div>
-
-            {/* Acciones del usuario */}
-            <div className="flex items-center space-x-4">
-              {/* Búsqueda */}
-              <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-gray-100 rounded-xl px-3 py-2">
                 <Search className="w-4 h-4 text-gray-500 mr-2" />
                 <input
                   type="text"
                   placeholder="Buscar modelos..."
-                  className="bg-transparent text-sm outline-none w-32"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-sm outline-none w-36"
                 />
-              </div>
+              </form>
 
-              {/* Favoritos */}
-              <button className="relative p-2 text-gray-600 hover:text-red-500 transition-colors">
-                <Heart className="w-5 h-5" />
-                <span className="cart-badge">0</span>
-              </button>
-
-              {/* Carrito */}
-              <Link href="/carrito" className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+              <Link
+                href="/carrito"
+                data-tour="cart-nav"
+                className="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+              >
                 <ShoppingCart className="w-5 h-5" />
-                <span className="cart-badge">{getCartCount()}</span>
+                {getCartCount() > 0 && (
+                  <span className="cart-badge">{getCartCount()}</span>
+                )}
               </Link>
 
-                    {/* Usuario */}
-                    <div className="relative">
-                      {user ? (
-                        <>
-                          <button
-                            onClick={() => setShowUserMenu(!showUserMenu)}
-                            className="flex items-center space-x-2 p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                          >
-                            <User className="w-5 h-5" />
-                            <span className="hidden sm:block text-sm font-medium">
-                              ¡Bienvenido, {user.displayName || user.email?.split('@')[0] || 'Usuario'}!
-                            </span>
-                          </button>
+              <div className="relative">
+                {user ? (
+                  <>
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                    >
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                      </div>
+                      <span className="hidden lg:block text-sm font-medium max-w-[120px] truncate">
+                        {user.displayName || user.email?.split('@')[0]}
+                      </span>
+                    </button>
                     {showUserMenu && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                      <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100">
                         {isAdmin && (
-                          <Link
-                            href="/admin"
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium"
-                            onClick={() => setShowUserMenu(false)}
-                          >
-                            <Shield className="w-4 h-4" />
-                            Panel Admin
+                          <Link href="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm text-purple-700 hover:bg-purple-50 font-medium" onClick={() => setShowUserMenu(false)}>
+                            <Shield className="w-4 h-4" /> Panel Admin
                           </Link>
                         )}
-                        <Link
-                          href="/perfil"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setShowUserMenu(false)}
-                        >
-                          Mi Perfil
-                        </Link>
-                        <Link
-                          href="/ordenes"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setShowUserMenu(false)}
-                        >
-                          Mis Órdenes
-                        </Link>
-                        <button
-                          onClick={() => {
-                            logout();
-                            setShowUserMenu(false);
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                        >
+                        <Link href="/perfil" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowUserMenu(false)}>Mi Perfil</Link>
+                        <Link href="/ordenes" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowUserMenu(false)}>Mis Órdenes</Link>
+                        <button onClick={() => { logout(); setShowUserMenu(false); }} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
                           Cerrar Sesión
                         </button>
                       </div>
                     )}
                   </>
                 ) : (
-                  <button 
-                    onClick={() => {
-                      setAuthMode('login');
-                      setShowAuthModal(true);
-                    }}
-                    className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                  <button
+                    onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:shadow-md transition-all"
                   >
-                    <User className="w-5 h-5" />
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">Entrar</span>
                   </button>
                 )}
               </div>
 
-              {/* Menú móvil */}
-              <button className="md:hidden p-2 text-gray-600">
-                <Menu className="w-5 h-5" />
+              <button className="md:hidden p-2 text-gray-600" onClick={() => setShowMobileMenu(!showMobileMenu)}>
+                {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-        </div>
-      </div>
-    </nav>
+            </div>
+          </div>
 
-    {/* Auth Modal */}
-    <AuthModal 
-      isOpen={showAuthModal} 
-      onClose={() => setShowAuthModal(false)}
-      initialMode={authMode}
-    />
-  </header>
-
+          {showMobileMenu && (
+            <div className="md:hidden py-4 border-t border-gray-100 space-y-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block px-4 py-3 rounded-lg font-medium ${isActive(link.href) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </nav>
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode={authMode} />
+      </header>
     </>
   );
 }
-

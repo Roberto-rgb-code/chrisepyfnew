@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CaseCustomizer, { ImageControls } from '@/components/CaseCustomizer';
@@ -8,184 +8,138 @@ import AuthModal from '@/components/AuthModal';
 import CartSuccessModal from '@/components/CartSuccessModal';
 import ImageWarningModal from '@/components/ImageWarningModal';
 import ImageUploadSuccessModal from '@/components/ImageUploadSuccessModal';
+import CheckoutSteps from '@/components/CheckoutSteps';
 import { phoneData, PhoneModel } from '@/data/phoneData';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useToast } from '@/contexts/ToastContext';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { uploadDesignImage } from '@/lib/uploadImage';
 
-export default function Home() {
-  const [selectedModel, setSelectedModel] = useState<PhoneModel>(phoneData.find(model => model.id === 'ip17promax') || phoneData[0]);
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const modelParam = searchParams.get('model');
+
+  const [selectedModel, setSelectedModel] = useState<PhoneModel>(
+    phoneData.find((m) => m.id === modelParam) || phoneData.find((m) => m.id === 'ip17promax') || phoneData[0]
+  );
   const [userImageSrc, setUserImageSrc] = useState<string | null>(null);
   const [imageControls, setImageControls] = useState<ImageControls>({
     scale: 1,
     rotation: 0,
     flipX: 1,
     flipY: 1,
-    position: { x: 0, y: 0 }
+    position: { x: 0, y: 0 },
   });
-         const [showAuthModal, setShowAuthModal] = useState(false);
-         const [showCartSuccess, setShowCartSuccess] = useState(false);
-         const [showImageWarning, setShowImageWarning] = useState(false);
-         const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCartSuccess, setShowCartSuccess] = useState(false);
+  const [showImageWarning, setShowImageWarning] = useState(false);
+  const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
 
   const { addToCart } = useCart();
-  const auth = useAuth();
-  const { user } = auth || {};
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    if (modelParam) {
+      const model = phoneData.find((m) => m.id === modelParam);
+      if (model) setSelectedModel(model);
+    }
+  }, [modelParam]);
 
   const handleModelChange = (model: PhoneModel) => {
     setSelectedModel(model);
-    // Reiniciar controles al cambiar modelo
-    setImageControls({
-      scale: 1,
-      rotation: 0,
-      flipX: 1,
-      flipY: 1,
-      position: { x: 0, y: 0 }
-    });
+    setImageControls({ scale: 1, rotation: 0, flipX: 1, flipY: 1, position: { x: 0, y: 0 } });
   };
 
   const handleImageUpload = async (file: File | null) => {
-    console.log('🖼️ handleImageUpload llamado con:', file);
-    
     if (!file) {
-      console.log('❌ No hay archivo');
       setUserImageSrc(null);
       return;
     }
 
-    // Validar que sea una imagen
-    if (!file.type || !file.type.startsWith('image/')) {
-      alert('Por favor, selecciona un archivo de imagen válido (JPG, PNG, GIF, etc.)');
+    if (!file.type?.startsWith('image/')) {
+      showToast('Selecciona una imagen válida (JPG, PNG)', 'error');
       return;
     }
 
-    console.log('📁 Archivo a subir:', {
-      name: file.name,
-      size: file.size,
-      type: file.type
-    });
-
-    if (user) {
-      console.log('✅ Usuario autenticado:', user.uid);
-    } else {
-      console.log('ℹ️ Usuario no autenticado - modo local (sin guardar en Firestore)');
-    }
-
     try {
-      // Convertir imagen a base64 (localmente, sin guardar en Firestore)
-      console.log('🚀 Convirtiendo imagen a base64...');
       const uploadResult = await uploadDesignImage(file, user?.uid);
-      
-      console.log('📤 Resultado de subida:', uploadResult);
-      
       if (uploadResult.success && uploadResult.url) {
-        console.log('✅ Imagen subida exitosamente:', uploadResult.url.substring(0, 50) + '...');
         setUserImageSrc(uploadResult.url);
-        setImageControls({
-          scale: 1,
-          rotation: 0,
-          flipX: 1,
-          flipY: 1,
-          position: { x: 0, y: 0 }
-        });
+        setImageControls({ scale: 1, rotation: 0, flipX: 1, flipY: 1, position: { x: 0, y: 0 } });
         setShowImageUploadSuccess(true);
       } else {
-        const errorMessage = uploadResult.error || 'Error desconocido al subir la imagen';
-        console.error('❌ Error subiendo imagen:', errorMessage);
-        alert(`Error al subir la imagen: ${errorMessage}`);
+        showToast(uploadResult.error || 'Error al subir la imagen', 'error');
       }
-    } catch (error: any) {
-      console.error('💥 Error en handleImageUpload:', error);
-      const errorMessage = error?.message || error?.toString() || 'Error desconocido';
-      alert(`Error al subir la imagen: ${errorMessage}`);
+    } catch {
+      showToast('Error al procesar la imagen', 'error');
     }
   };
 
   const handleImageClear = () => {
     setUserImageSrc(null);
-    setImageControls({
-      scale: 1,
-      rotation: 0,
-      flipX: 1,
-      flipY: 1,
-      position: { x: 0, y: 0 }
-    });
+    setImageControls({ scale: 1, rotation: 0, flipX: 1, flipY: 1, position: { x: 0, y: 0 } });
   };
 
   const handleAddToCart = async () => {
-    try {
-      // Requerir login para agregar al carrito
-      if (!user) {
-        setShowAuthModal(true);
-        alert('Debes iniciar sesión para agregar productos al carrito');
-        return;
-      }
-
-      if (!userImageSrc) {
-        setShowImageWarning(true);
-        return;
-      }
-
-      const cartItem = {
-        id: `${selectedModel.id}-${Date.now()}`,
-        modelName: selectedModel.modelName,
-        colorURL: selectedModel.colorURL,
-        maskURL: selectedModel.maskURL,
-        customImage: userImageSrc,
-        price: 599,
-        quantity: 1,
-        imageControls: { ...imageControls }
-      };
-
-      if (addToCart) {
-        addToCart(cartItem);
-        setShowCartSuccess(true);
-
-        if (user) {
-          try {
-            await fetch('/api/personalizations', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: user.uid,
-                userEmail: user.email,
-                modelId: selectedModel.id,
-                modelName: selectedModel.modelName,
-                customImageUrl: userImageSrc,
-                imageControls: imageControls,
-              }),
-            });
-          } catch (dbError) {
-            console.error('Error guardando personalización:', dbError);
-          }
-        }
-      } else {
-        console.error('addToCart function not available');
-      }
-    } catch (error) {
-      console.error('Error in handleAddToCart:', error);
+    if (!userImageSrc) {
+      setShowImageWarning(true);
+      return;
     }
-  };
 
-  const handleGoToCart = () => {
-    setShowCartSuccess(false);
-    router.push('/carrito');
-  };
+    const cartItem = {
+      id: `${selectedModel.id}-${Date.now()}`,
+      modelName: selectedModel.modelName,
+      colorURL: selectedModel.colorURL,
+      maskURL: selectedModel.maskURL,
+      customImage: userImageSrc,
+      price: 599,
+      quantity: 1,
+      imageControls: { ...imageControls },
+    };
 
-  const handleContinueShopping = () => {
-    setShowCartSuccess(false);
-    handleImageClear();
-  };
+    addToCart(cartItem);
+    setShowCartSuccess(true);
+    showToast('¡Funda agregada al carrito!', 'success');
 
-  const handleLoginClick = () => {
-    setShowAuthModal(true);
+    if (user) {
+      try {
+        await fetch('/api/personalizations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.uid,
+            userEmail: user.email,
+            modelId: selectedModel.id,
+            modelName: selectedModel.modelName,
+            customImageUrl: userImageSrc,
+            imageControls,
+          }),
+        });
+      } catch {
+        /* non-blocking */
+      }
+    }
   };
 
   return (
     <>
-      <Navbar />
+      <div className="bg-gradient-to-b from-slate-50 to-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <CheckoutSteps current={1} />
+          <div className="text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              Diseña tu funda en minutos
+            </h1>
+            <p className="text-gray-600 max-w-xl mx-auto">
+              Elige tu modelo, sube tu foto y ajusta el diseño. Paga cuando estés listo.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <CaseCustomizer
         selectedModel={selectedModel}
         onModelChange={handleModelChange}
@@ -197,37 +151,30 @@ export default function Home() {
         onImageControlsChange={setImageControls}
         onAddToCart={handleAddToCart}
         isAuthenticated={!!user}
-        onLoginClick={handleLoginClick}
-      />
-      <Footer />
-      
-      {/* Modal de autenticación */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode="login"
+        onLoginClick={() => setShowAuthModal(true)}
       />
 
-      {/* Modal de éxito del carrito */}
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode="login" />
       <CartSuccessModal
         isOpen={showCartSuccess}
         onClose={() => setShowCartSuccess(false)}
-        onGoToCart={handleGoToCart}
-        onContinueShopping={handleContinueShopping}
+        onGoToCart={() => { setShowCartSuccess(false); router.push('/carrito'); }}
+        onContinueShopping={() => { setShowCartSuccess(false); handleImageClear(); }}
       />
+      <ImageWarningModal isOpen={showImageWarning} onClose={() => setShowImageWarning(false)} />
+      <ImageUploadSuccessModal isOpen={showImageUploadSuccess} onClose={() => setShowImageUploadSuccess(false)} />
+    </>
+  );
+}
 
-             {/* Modal de advertencia de imagen */}
-             <ImageWarningModal
-               isOpen={showImageWarning}
-               onClose={() => setShowImageWarning(false)}
-             />
-
-             {/* Modal de éxito de subida de imagen */}
-             <ImageUploadSuccessModal
-               isOpen={showImageUploadSuccess}
-               onClose={() => setShowImageUploadSuccess(false)}
-             />
-           </>
-         );
-       }
-
+export default function Home() {
+  return (
+    <>
+      <Navbar />
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}>
+        <HomeContent />
+      </Suspense>
+      <Footer />
+    </>
+  );
+}

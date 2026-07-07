@@ -10,7 +10,8 @@ Aplicación Next.js 14 para personalización y venta de fundas de teléfono con 
 - ✅ **Carrito de Compras**: Sistema completo de carrito con persistencia
 - ✅ **Stripe Checkout**: Pasarela de pago segura integrada
 - ✅ **Responsive Design**: Optimizado para móviles, tablets y desktop
-- ✅ **Panel de Administración**: Vista exclusiva para ver compras, movimientos y clientes
+- ✅ **Tour guiado** con Driver.js para nuevos usuarios
+- ✅ **Emails con diseño adjunto** — confirmación incluye imagen personalizada inline
 
 ## 📋 Requisitos Previos
 
@@ -78,7 +79,15 @@ npm run seed:admin
 
 También puedes usar la página `/setup-admin` una sola vez.
 
-### Qué puede ver el admin
+### Flujo de compra
+
+1. Personaliza tu funda (sin necesidad de cuenta)
+2. Agrega al carrito
+3. Inicia sesión o regístrate al pagar
+4. Paga con Stripe
+5. Recibe email con tu diseño personalizado adjunto
+
+Usa el botón **"Tour guiado"** (esquina inferior izquierda) para aprender a usar el personalizador.
 
 - **Compras** — Todas las órdenes con detalle de productos y diseños personalizados
 - **Movimientos** — Actividad de clientes: compras, carritos, personalizaciones y registros

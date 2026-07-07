@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth as firebaseAuth } from '@/lib/firebase';
 import { Smartphone, X } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialMode?: 'login' | 'register';
+  onSuccess?: () => void;
 }
 
-export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSuccess }: AuthModalProps) {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -69,11 +72,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
         await login(email, password);
       }
       onClose();
-      // Limpiar formulario
       setName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      onSuccess?.();
     } catch (err: any) {
       if (mode === 'login') {
         setError('Error al iniciar sesión. Verifica tus credenciales.');
@@ -205,7 +208,20 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                 <input type="checkbox" className="mr-2" />
                 <span className="text-gray-600">Recordarme</span>
               </label>
-              <button type="button" className="text-blue-600 hover:text-blue-700">
+              <button
+                type="button"
+                className="text-blue-600 hover:text-blue-700"
+                onClick={async () => {
+                  if (!email) { setError('Ingresa tu email primero'); return; }
+                  try {
+                    if (firebaseAuth) await sendPasswordResetEmail(firebaseAuth, email);
+                    setError('');
+                    alert('Te enviamos un enlace para restablecer tu contraseña');
+                  } catch {
+                    setError('No se pudo enviar el enlace. Verifica tu email.');
+                  }
+                }}
+              >
                 ¿Olvidaste tu contraseña?
               </button>
             </div>

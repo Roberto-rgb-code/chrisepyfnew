@@ -1,7 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
-import { PhoneModel } from '@/data/phoneData';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 
 export interface ImageControls {
@@ -42,26 +41,61 @@ export function useCart() {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const { user } = useAuth();
+  const mergedRef = useRef(false);
 
-  // Cargar carrito del localStorage (específico por usuario)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const cartKey = user ? `cart_${user.uid}` : 'cart_guest';
-      const savedCart = localStorage.getItem(cartKey);
-      if (savedCart) {
-        try {
-          setCart(JSON.parse(savedCart));
-        } catch (error) {
-          console.error('Error parsing cart from localStorage:', error);
-          localStorage.removeItem(cartKey);
+    if (typeof window === 'undefined') return;
+
+    const loadCart = () => {
+      if (user) {
+        const userKey = `cart_${user.uid}`;
+        const guestCart = localStorage.getItem('cart_guest');
+        const userCart = localStorage.getItem(userKey);
+
+        if (guestCart && !mergedRef.current) {
+          try {
+            const guestItems: CartItem[] = JSON.parse(guestCart);
+            const userItems: CartItem[] = userCart ? JSON.parse(userCart) : [];
+            const merged = [...userItems, ...guestItems];
+            localStorage.setItem(userKey, JSON.stringify(merged));
+            localStorage.removeItem('cart_guest');
+            setCart(merged);
+            mergedRef.current = true;
+            return;
+          } catch {
+            localStorage.removeItem('cart_guest');
+          }
+        }
+
+        if (userCart) {
+          try {
+            setCart(JSON.parse(userCart));
+          } catch {
+            localStorage.removeItem(userKey);
+            setCart([]);
+          }
+        } else {
+          setCart([]);
         }
       } else {
-        setCart([]); // Limpiar carrito si no hay datos para este usuario
+        mergedRef.current = false;
+        const guestCart = localStorage.getItem('cart_guest');
+        if (guestCart) {
+          try {
+            setCart(JSON.parse(guestCart));
+          } catch {
+            localStorage.removeItem('cart_guest');
+            setCart([]);
+          }
+        } else {
+          setCart([]);
+        }
       }
-    }
-  }, [user]);
+    };
 
-  // Guardar carrito en localStorage (específico por usuario)
+    loadCart();
+  }, [user?.uid]);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const cartKey = user ? `cart_${user.uid}` : 'cart_guest';
@@ -70,19 +104,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart, user]);
 
   const addToCart = (item: CartItem) => {
-    try {
-      setCart((prevCart) => {
-        const existingItem = prevCart.find((i) => i.id === item.id);
-        if (existingItem) {
-          return prevCart.map((i) =>
-            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-          );
-        }
-        return [...prevCart, item];
-      });
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-    }
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((i) => i.id === item.id);
+      if (existingItem) {
+        return prevCart.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      }
+      return [...prevCart, item];
+    });
   };
 
   const removeFromCart = (id: string) => {
@@ -95,39 +125,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
+      prevCart.map((item) => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
   const clearCart = () => {
     setCart([]);
-    // Limpiar también del localStorage
     if (typeof window !== 'undefined') {
       const cartKey = user ? `cart_${user.uid}` : 'cart_guest';
       localStorage.removeItem(cartKey);
     }
   };
 
-  const getCartTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  const getCartTotal = () => cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
-  const getCartCount = () => {
-    return cart.reduce((count, item) => count + item.quantity, 0);
-  };
+  const getCartCount = () => cart.reduce((count, item) => count + item.quantity, 0);
 
-  const value = {
-    cart,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getCartTotal,
-    getCartCount
-  };
-
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
-

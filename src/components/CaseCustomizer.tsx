@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { PhoneModel } from '@/data/phoneData';
 import { Crosshair } from 'lucide-react';
 import Image from 'next/image';
-import AuthWarningModal from './AuthWarningModal';
 
 export interface ImageControls {
   scale: number;
@@ -44,7 +43,6 @@ export default function CaseCustomizer({
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
-  const [showAuthWarning, setShowAuthWarning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard controls
@@ -209,23 +207,12 @@ export default function CaseCustomizer({
 
   const handleAddToCartClick = () => {
     try {
-      if (!isAuthenticated) {
-        setShowAuthWarning(true);
-        return;
-      }
       if (onAddToCart) {
         onAddToCart();
-      } else {
-        console.error('onAddToCart function not available');
       }
     } catch (error) {
       console.error('Error in handleAddToCartClick:', error);
     }
-  };
-
-  const handleLoginFromWarning = () => {
-    setShowAuthWarning(false);
-    onLoginClick();
   };
 
   const customImageStyle = {
@@ -247,7 +234,7 @@ export default function CaseCustomizer({
   return (
     <div className="main-content">
       {/* Sidebar Izquierdo */}
-      <div className="sidebar-left fade-in">
+      <div className="sidebar-left fade-in" data-tour="model-select">
         <h2 className="sidebar-title">📱 Selecciona tu Modelo</h2>
         <select
           className="model-select"
@@ -265,7 +252,7 @@ export default function CaseCustomizer({
         </select>
 
         <h2 className="sidebar-title upload-title">🖼️ Sube tu Imagen</h2>
-        <label className="upload-area">
+        <label className="upload-area" data-tour="upload">
           <span className="upload-icon">📤</span>
           <span className="upload-text">Arrastra tu imagen aquí</span>
           <input
@@ -301,7 +288,7 @@ export default function CaseCustomizer({
       </div>
 
       {/* Área de Preview Central */}
-      <div className="case-preview fade-in">
+      <div className="case-preview fade-in" data-tour="preview">
         <div
           className="case-container"
           onMouseDown={handleMouseDown}
@@ -348,13 +335,13 @@ export default function CaseCustomizer({
       </div>
 
       {/* Sidebar Derecho */}
-      <div className="sidebar-right fade-in">
+      <div className="sidebar-right fade-in" data-tour="controls">
         <div className="price-section">
           <div className="price-amount">$599 MXN</div>
           <div className="price-subtitle">Envío gratis incluido</div>
         </div>
 
-        <button onClick={handleAddToCartClick} className="primary-button add-to-cart-button">
+        <button onClick={handleAddToCartClick} className="primary-button add-to-cart-button" data-tour="add-cart">
           🛒 Agregar al Carrito
         </button>
 
@@ -433,13 +420,6 @@ export default function CaseCustomizer({
           </div>
         </div>
       </div>
-
-      {/* Modal de advertencia de autenticación */}
-      <AuthWarningModal
-        isOpen={showAuthWarning}
-        onClose={() => setShowAuthWarning(false)}
-        onLogin={handleLoginFromWarning}
-      />
     </div>
   );
 }
