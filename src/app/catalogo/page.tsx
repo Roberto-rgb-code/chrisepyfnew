@@ -1,24 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { PhoneModel } from '@/data/phoneData';
 import { phoneData } from '@/data/phoneData';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import LoadingScreen from '@/components/LoadingScreen';
+import ModelSearchBox from '@/components/ModelSearchBox';
 import { Search, Filter, Grid, List } from '@/components/icons';
 
-export default function CatalogoPage() {
-  const [searchTerm, setSearchTerm] = useState('');
+function CatalogoContent() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get('q') || '';
+
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('name-asc');
 
-  // Filtrar y ordenar modelos
+  useEffect(() => {
+    setSearchTerm(initialQuery);
+  }, [initialQuery]);
+
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+  };
+
   const filteredModels = phoneData
-    .filter(model => {
-      const matchesSearch = model.modelName.toLowerCase().includes(searchTerm.toLowerCase());
+    .filter((model) => {
+      const matchesSearch = model.modelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        model.brand.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesBrand = selectedBrand === 'all' || model.brand === selectedBrand;
       return matchesSearch && matchesBrand;
     })
@@ -28,17 +42,17 @@ export default function CatalogoPage() {
           return a.modelName.localeCompare(b.modelName);
         case 'name-desc':
           return b.modelName.localeCompare(a.modelName);
-        case 'brand-asc':
-          // Primero por marca, luego por nombre
+        case 'brand-asc': {
           const brandCompare = a.brand.localeCompare(b.brand);
           if (brandCompare !== 0) return brandCompare;
           return a.modelName.localeCompare(b.modelName);
-        case 'brand-desc':
+        }
+        case 'brand-desc': {
           const brandCompareDesc = b.brand.localeCompare(a.brand);
           if (brandCompareDesc !== 0) return brandCompareDesc;
           return a.modelName.localeCompare(b.modelName);
+        }
         case 'newest':
-          // Los iPhone 17 primero, luego iPhone 16, etc.
           return b.id.localeCompare(a.id);
         case 'oldest':
           return a.id.localeCompare(b.id);
@@ -47,14 +61,12 @@ export default function CatalogoPage() {
       }
     });
 
-  // Obtener marcas únicas y ordenarlas alfabéticamente
-  const brands = ['all', ...Array.from(new Set(phoneData.map(model => model.brand))).sort()];
+  const brands = ['all', ...Array.from(new Set(phoneData.map((model) => model.brand))).sort()];
 
   return (
     <>
       <Navbar />
-      
-      {/* Hero Section */}
+
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-10 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -64,29 +76,21 @@ export default function CatalogoPage() {
             <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 opacity-90">
               Más de 60 modelos de teléfonos disponibles
             </p>
-            
-            {/* Barra de búsqueda */}
+
             <div className="max-w-2xl mx-auto">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Buscar modelo de teléfono..."
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl border-0 text-gray-800 text-lg focus:ring-4 focus:ring-white/20 focus:outline-none"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+              <ModelSearchBox
+                variant="hero"
+                defaultValue={searchTerm}
+                onSearch={handleSearch}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filtros y controles */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            {/* Filtros */}
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center space-x-2">
                 <Filter className="w-5 h-5 text-gray-500" />
@@ -95,14 +99,14 @@ export default function CatalogoPage() {
                   onChange={(e) => setSelectedBrand(e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  {brands.map(brand => (
+                  {brands.map((brand) => (
                     <option key={brand} value={brand}>
                       {brand === 'all' ? 'Todas las marcas' : brand}
                     </option>
                   ))}
                 </select>
               </div>
-              
+
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -117,10 +121,12 @@ export default function CatalogoPage() {
               </select>
             </div>
 
-            {/* Vista */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <span className="text-sm text-gray-600">
                 {filteredModels.length} modelos encontrados
+                {searchTerm && (
+                  <span className="text-blue-600 font-medium"> · &quot;{searchTerm}&quot;</span>
+                )}
               </span>
               <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                 <button
@@ -141,7 +147,6 @@ export default function CatalogoPage() {
         </div>
       </div>
 
-      {/* Grid de modelos */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -177,7 +182,14 @@ export default function CatalogoPage() {
   );
 }
 
-// Componente de tarjeta para vista de cuadrícula
+export default function CatalogoPage() {
+  return (
+    <Suspense fallback={<LoadingScreen message="Cargando catálogo..." />}>
+      <CatalogoContent />
+    </Suspense>
+  );
+}
+
 function ModelCard({ model }: { model: PhoneModel }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
@@ -192,7 +204,7 @@ function ModelCard({ model }: { model: PhoneModel }) {
           {model.brand}
         </div>
       </div>
-      
+
       <div className="p-6">
         <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2">
           {model.modelName}
@@ -200,7 +212,7 @@ function ModelCard({ model }: { model: PhoneModel }) {
         <p className="text-gray-600 text-sm mb-4">
           Funda personalizable disponible
         </p>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-blue-600">
             $599 MXN
@@ -217,7 +229,6 @@ function ModelCard({ model }: { model: PhoneModel }) {
   );
 }
 
-// Componente de lista para vista de lista
 function ModelListItem({ model }: { model: PhoneModel }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">

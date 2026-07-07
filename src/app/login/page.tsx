@@ -1,11 +1,19 @@
 'use client';
 
 import { useState, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Smartphone, ArrowRight } from '@/components/icons';
+import { ArrowRight } from '@/components/icons';
+import PhoneLoader from '@/components/PhoneLoader';
+import LoadingScreen from '@/components/LoadingScreen';
 import { ADMIN_EMAIL } from '@/lib/constants';
+
+const LoginAnimation = dynamic(() => import('@/components/LoginAnimation'), {
+  ssr: false,
+  loading: () => <PhoneLoader size="sm" className="mx-auto" />,
+});
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -37,16 +45,13 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 py-8">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 sm:p-8 border border-gray-100">
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-            <Smartphone className="w-7 h-7 text-white" />
-          </div>
-          <span className="logo-text text-2xl">Empaques & Fundas</span>
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 sm:p-8 border border-gray-100 overflow-hidden">
+        <div className="mb-4">
+          <LoginAnimation />
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-1">Bienvenido de vuelta</h1>
-        <p className="text-gray-500 text-center mb-8">Inicia sesión para continuar tu compra</p>
+        <p className="text-gray-500 text-center mb-6">Inicia sesión para continuar tu compra</p>
 
         {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-4 text-sm">{error}</div>}
 
@@ -78,7 +83,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}>
+    <Suspense fallback={<LoadingScreen message="Preparando inicio de sesión..." />}>
       <LoginForm />
     </Suspense>
   );

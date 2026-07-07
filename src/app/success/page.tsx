@@ -9,12 +9,12 @@ import Footer from '@/components/Footer';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import { Mail, Package, ArrowRight, Sparkles } from '@/components/icons';
 import { formatOrderNumber } from '@/lib/email-utils';
+import PhoneLoader from '@/components/PhoneLoader';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const SuccessAnimation = dynamic(() => import('@/components/SuccessAnimation'), {
   ssr: false,
-  loading: () => (
-    <div className="w-[220px] h-[220px] mx-auto rounded-full bg-gradient-to-br from-green-100 to-blue-100 animate-pulse" />
-  ),
+  loading: () => <PhoneLoader size="md" className="mx-auto" />,
 });
 
 function SuccessContent() {
@@ -145,16 +145,7 @@ function SuccessContent() {
 
 export default function SuccessPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Confirmando tu pedido...</p>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingScreen message="Confirmando tu pedido..." submessage="Verificando tu pago" />}>
       <SuccessContent />
     </Suspense>
   );

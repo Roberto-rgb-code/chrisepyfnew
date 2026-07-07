@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import LoadingScreen from '@/components/LoadingScreen';
 import { 
   ShoppingBag, 
   DollarSign, 
@@ -306,12 +307,7 @@ export default function AdminPage() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <RefreshCw className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Cargando panel de administración...</p>
-          </div>
-        </div>
+        <LoadingScreen message="Cargando panel de administración..." submessage="Sincronizando datos" />
       </>
     );
   }

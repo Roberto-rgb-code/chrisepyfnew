@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import CasePreview from '@/components/CasePreview';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import AuthModal from '@/components/AuthModal';
+import LoadingScreen from '@/components/LoadingScreen';
 import { Trash2, Plus, Minus, ShoppingBag, Shield, Truck, Lock } from '@/components/icons';
 import { redirectToCheckout } from '@/lib/stripe';
 
@@ -186,7 +187,7 @@ export default function CartPage() {
   return (
     <>
       <Navbar />
-      <Suspense fallback={<div className="py-20 text-center">Cargando carrito...</div>}>
+      <Suspense fallback={<LoadingScreen fullScreen={false} message="Cargando carrito..." className="py-20" />}>
         <CartContent />
       </Suspense>
       <Footer />

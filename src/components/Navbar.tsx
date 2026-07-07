@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { Smartphone, Search, ShoppingCart, User, Menu, Shield, X } from '@/components/icons';
+import { Smartphone, ShoppingCart, User, Menu, Shield, X } from '@/components/icons';
 import { useState } from 'react';
 import AuthModal from './AuthModal';
 import AnnouncementBar from './AnnouncementBar';
+import ModelSearchBox from './ModelSearchBox';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -17,7 +18,6 @@ export default function Navbar() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const navLinks = [
     { href: '/', label: 'Personalizar' },
@@ -26,13 +26,6 @@ export default function Navbar() {
   ];
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/catalogo?q=${encodeURIComponent(searchQuery.trim())}`;
-    }
-  };
 
   return (
     <>
@@ -59,17 +52,10 @@ export default function Navbar() {
               ))}
             </div>
 
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-gray-100 rounded-xl px-3 py-2">
-                <Search className="w-4 h-4 text-gray-500 mr-2" />
-                <input
-                  type="text"
-                  placeholder="Buscar modelos..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-sm outline-none w-36"
-                />
-              </form>
+            <div className="flex items-center gap-1.5 sm:gap-4 flex-1 justify-end min-w-0">
+              <div className="min-w-0 hidden sm:block sm:flex-1 sm:max-w-xs md:max-w-sm lg:max-w-md">
+                <ModelSearchBox variant="navbar" />
+              </div>
 
               <Link
                 href="/carrito"
@@ -114,7 +100,7 @@ export default function Navbar() {
                 ) : (
                   <button
                     onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:shadow-md transition-all"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:shadow-md transition-all"
                   >
                     <User className="w-4 h-4" />
                     <span className="hidden sm:inline">Entrar</span>
@@ -129,7 +115,10 @@ export default function Navbar() {
           </div>
 
           {showMobileMenu && (
-            <div className="md:hidden py-4 border-t border-gray-100 space-y-1">
+            <div className="md:hidden py-4 border-t border-gray-100 space-y-3">
+              <div className="px-2">
+                <ModelSearchBox variant="navbar" />
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}

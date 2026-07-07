@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import LoadingScreen from '@/components/LoadingScreen';
 import CasePreview from '@/components/CasePreview';
 import { Package, Calendar, CreditCard, ChevronDown, ChevronUp } from '@/components/icons';
 import { formatOrderNumber } from '@/lib/email-utils';
@@ -64,9 +65,7 @@ export default function OrdersPage() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-        </div>
+        <LoadingScreen message="Cargando tus órdenes..." submessage="Un momento por favor" />
         <Footer />
       </>
     );

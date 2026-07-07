@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import LoadingScreen from '@/components/LoadingScreen';
 import CaseCustomizer, { ImageControls } from '@/components/CaseCustomizer';
 import AuthModal from '@/components/AuthModal';
 import CartSuccessModal from '@/components/CartSuccessModal';
@@ -171,7 +172,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}>
+      <Suspense fallback={<LoadingScreen message="Cargando personalizador..." submessage="Preparando tu experiencia" />}>
         <HomeContent />
       </Suspense>
       <Footer />
