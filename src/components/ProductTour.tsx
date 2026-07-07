@@ -3,13 +3,15 @@
 import { useEffect } from 'react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle } from '@/components/icons';
 
 const TOUR_KEY = 'efm_tour_completed';
 
 export function startProductTour(force = false) {
   if (typeof window === 'undefined') return;
   if (!force && localStorage.getItem(TOUR_KEY)) return;
+
+  const isMobile = window.innerWidth < 640;
 
   const driverObj = driver({
     showProgress: true,
@@ -25,7 +27,7 @@ export function startProductTour(force = false) {
         popover: {
           title: '📱 Elige tu modelo',
           description: 'Selecciona el modelo exacto de tu teléfono. Tenemos iPhone, Samsung y Google Pixel.',
-          side: 'right',
+          side: isMobile ? 'bottom' : 'right',
         },
       },
       {
@@ -33,7 +35,7 @@ export function startProductTour(force = false) {
         popover: {
           title: '🖼️ Sube tu imagen',
           description: 'Arrastra o selecciona la foto que quieres en tu funda. JPG y PNG hasta 4 MB.',
-          side: 'right',
+          side: isMobile ? 'bottom' : 'right',
         },
       },
       {
@@ -41,7 +43,7 @@ export function startProductTour(force = false) {
         popover: {
           title: '👀 Vista previa en vivo',
           description: 'Aquí ves cómo quedará tu funda. Puedes arrastrar la imagen para posicionarla.',
-          side: 'left',
+          side: isMobile ? 'bottom' : 'left',
         },
       },
       {
@@ -49,7 +51,7 @@ export function startProductTour(force = false) {
         popover: {
           title: '🎛️ Ajusta tu diseño',
           description: 'Escala, rota y voltea tu imagen. Usa las flechas del teclado para moverla con precisión.',
-          side: 'left',
+          side: isMobile ? 'bottom' : 'left',
         },
       },
       {
@@ -86,7 +88,7 @@ export default function ProductTour() {
   return (
     <button
       onClick={() => startProductTour(true)}
-      className="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl hover:border-blue-300 transition-all text-sm font-medium text-gray-700 hover:text-blue-600"
+      className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl hover:border-blue-300 transition-all text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 bottom-safe max-w-[calc(100vw-5rem)]"
       title="Ver tour guiado"
     >
       <HelpCircle className="w-5 h-5" />

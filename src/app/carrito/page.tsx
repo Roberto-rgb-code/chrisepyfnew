@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 import CasePreview from '@/components/CasePreview';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import AuthModal from '@/components/AuthModal';
-import { Trash2, Plus, Minus, ShoppingBag, Shield, Truck, Lock } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, Shield, Truck, Lock } from '@/components/icons';
 import { redirectToCheckout } from '@/lib/stripe';
 
 function CartContent() {
@@ -82,41 +82,45 @@ function CartContent() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <CheckoutSteps current={2} />
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Tu carrito</h1>
-      <p className="text-gray-600 mb-8">{cart.length} producto(s) · Revisa tu diseño antes de pagar</p>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Tu carrito</h1>
+      <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">{cart.length} producto(s) · Revisa tu diseño antes de pagar</p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-4">
           {cart.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 hover:border-blue-100 transition-colors">
-              <div className="flex items-center gap-5">
-                <CasePreview item={item} />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold text-gray-900">{item.modelName}</h3>
-                  <p className="text-sm text-purple-600 font-medium">🎨 Diseño personalizado</p>
-                  <p className="text-xl font-bold text-green-600 mt-2">${item.price} MXN</p>
+            <div key={item.id} className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 hover:border-blue-100 transition-colors">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <CasePreview item={item} />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">{item.modelName}</h3>
+                    <p className="text-sm text-purple-600 font-medium">🎨 Diseño personalizado</p>
+                    <p className="text-lg sm:text-xl font-bold text-green-600 mt-2">${item.price} MXN</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-1">
-                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white transition-colors">
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="w-8 text-center font-bold">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white transition-colors">
-                    <Plus className="w-4 h-4" />
+                <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-3 sm:pt-0">
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-1">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg hover:bg-white transition-colors">
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-8 text-center font-bold">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg hover:bg-white transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <button onClick={() => removeFromCart(item.id)} className="p-2.5 sm:p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
-                <button onClick={() => removeFromCart(item.id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                  <Trash2 className="w-5 h-5" />
-                </button>
               </div>
             </div>
           ))}
         </div>
 
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 sticky top-24">
+          <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 lg:sticky lg:top-24">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Resumen</h2>
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-gray-600">

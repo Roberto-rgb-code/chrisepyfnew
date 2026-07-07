@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth as firebaseAuth } from '@/lib/firebase';
-import { Smartphone, X } from 'lucide-react';
+import { Smartphone, X } from '@/components/icons';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -97,7 +97,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
       {/* Fondo con blur */}
@@ -105,7 +105,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
 
       {/* Modal */}
       <div 
-        className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-md p-8 border border-white/20 animate-in fade-in zoom-in duration-300"
+        className="relative bg-white/95 backdrop-blur-xl rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md max-h-[92dvh] overflow-y-auto p-6 sm:p-8 border border-white/20 animate-in fade-in zoom-in duration-300 mt-auto sm:mt-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Botón cerrar */}

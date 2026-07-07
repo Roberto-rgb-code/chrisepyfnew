@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Image, Upload } from 'lucide-react';
+import { X, Image, Upload } from '@/components/icons';
 
 interface ImageWarningModalProps {
   isOpen: boolean;

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import { X, AlertCircle } from '@/components/icons';
 
 interface AuthWarningModalProps {
   isOpen: boolean;

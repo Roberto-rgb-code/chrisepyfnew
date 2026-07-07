@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CasePreview from '@/components/CasePreview';
-import { Package, Calendar, CreditCard, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, Calendar, CreditCard, ChevronDown, ChevronUp } from '@/components/icons';
 import { formatOrderNumber } from '@/lib/email-utils';
 
 interface OrderItem {
@@ -75,9 +75,9 @@ export default function OrdersPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Mis órdenes</h1>
-        <p className="text-gray-600 mb-8">Historial de tus compras y diseños</p>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Mis órdenes</h1>
+        <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Historial de tus compras y diseños</p>
 
         {orders.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
@@ -93,7 +93,7 @@ export default function OrdersPage() {
             {orders.map((order) => (
               <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <button
-                  className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-gray-50 transition-colors text-left"
                   onClick={() => {
                     const next = new Set(expanded);
                     next.has(order.id) ? next.delete(order.id) : next.add(order.id);
@@ -106,12 +106,12 @@ export default function OrdersPage() {
                       {new Date(order.orderDate || order.createdAt).toLocaleDateString('es-MX', { dateStyle: 'long' })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto sm:justify-end">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[order.status] || 'bg-gray-100 text-gray-700'}`}>
                       {order.status}
                     </span>
                     <span className="font-bold text-green-600">${order.amountTotal} MXN</span>
-                    {expanded.has(order.id) ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                    {expanded.has(order.id) ? <ChevronUp className="w-5 h-5 text-gray-400 ml-auto sm:ml-0" /> : <ChevronDown className="w-5 h-5 text-gray-400 ml-auto sm:ml-0" />}
                   </div>
                 </button>
 

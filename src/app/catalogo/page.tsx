@@ -7,7 +7,7 @@ import { PhoneModel } from '@/data/phoneData';
 import { phoneData } from '@/data/phoneData';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Search, Filter, Grid, List } from 'lucide-react';
+import { Search, Filter, Grid, List } from '@/components/icons';
 
 export default function CatalogoPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,13 +55,13 @@ export default function CatalogoPage() {
       <Navbar />
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-10 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
               Catálogo de Fundas
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
+            <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 opacity-90">
               Más de 60 modelos de teléfonos disponibles
             </p>
             
@@ -118,7 +118,7 @@ export default function CatalogoPage() {
             </div>
 
             {/* Vista */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <span className="text-sm text-gray-600">
                 {filteredModels.length} modelos encontrados
               </span>
@@ -221,8 +221,8 @@ function ModelCard({ model }: { model: PhoneModel }) {
 function ModelListItem({ model }: { model: PhoneModel }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-      <div className="flex">
-        <div className="relative w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row">
+        <div className="relative w-full sm:w-32 h-40 sm:h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
           <Image
             src={model.colorURL}
             alt={model.modelName}
@@ -230,30 +230,30 @@ function ModelListItem({ model }: { model: PhoneModel }) {
             className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
           />
         </div>
-        
-        <div className="flex-1 p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center space-x-3 mb-2">
+
+        <div className="flex-1 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                 <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-medium">
                   {model.brand}
                 </span>
-                <h3 className="font-bold text-lg text-gray-800">
+                <h3 className="font-bold text-base sm:text-lg text-gray-800">
                   {model.modelName}
                 </h3>
               </div>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-gray-600 text-sm mb-3 sm:mb-4">
                 Funda personalizable disponible con protección premium
               </p>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-2xl font-bold text-blue-600">
+
+            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+              <span className="text-xl sm:text-2xl font-bold text-blue-600">
                 $599 MXN
               </span>
               <Link
                 href={`/?model=${model.id}`}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 sm:px-6 py-2.5 sm:py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm sm:text-base whitespace-nowrap"
               >
                 Personalizar
               </Link>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, CheckCircle, ShoppingCart } from 'lucide-react';
+import { X, CheckCircle, ShoppingCart } from '@/components/icons';
 
 interface ConfirmationModalProps {
   isOpen: boolean;

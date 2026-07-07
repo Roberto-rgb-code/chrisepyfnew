@@ -22,7 +22,7 @@ import {
   Filter,
   ChevronDown,
   ChevronUp,
-  Image as ImageIcon,
+  ImageIcon,
   Smartphone,
   ZoomIn,
   RotateCw,
@@ -32,7 +32,7 @@ import {
   Activity,
   UserCircle,
   ShoppingCart
-} from 'lucide-react';
+} from '@/components/icons';
 
 interface Order {
   id: string;
@@ -326,9 +326,9 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">🛠️ Panel de Administración</h1>
-            <p className="text-gray-600 mt-2">Compras, movimientos y actividad de todos los clientes</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">🛠️ Panel de Administración</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-2">Compras, movimientos y actividad de todos los clientes</p>
           </div>
 
           {/* Tabs */}
@@ -473,7 +473,7 @@ export default function AdminPage() {
           {activeTab === 'orders' && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[640px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -823,7 +823,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[640px]">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Tipo</th>
@@ -879,7 +879,7 @@ export default function AdminPage() {
           {activeTab === 'clients' && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[640px]">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Cliente</th>

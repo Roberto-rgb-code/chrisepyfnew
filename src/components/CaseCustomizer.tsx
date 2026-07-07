@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { PhoneModel } from '@/data/phoneData';
-import { Crosshair } from 'lucide-react';
+import { Crosshair } from '@/components/icons';
 import Image from 'next/image';
 
 export interface ImageControls {

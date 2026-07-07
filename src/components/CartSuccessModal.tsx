@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, CheckCircle, ShoppingCart, ArrowRight } from 'lucide-react';
+import { X, CheckCircle, ShoppingCart, ArrowRight } from '@/components/icons';
 
 interface CartSuccessModalProps {
   isOpen: boolean;

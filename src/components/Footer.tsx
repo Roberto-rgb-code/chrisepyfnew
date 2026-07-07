@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Smartphone, Facebook, Instagram, Twitter, Send } from 'lucide-react';
+import { Smartphone, Facebook, Instagram, Twitter, Send } from '@/components/icons';
 
 export default function Footer() {
   return (
@@ -61,8 +61,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-          <p>&copy; 2025 Empaques & Fundas. Todos los derechos reservados. | Política de Privacidad | Términos de Servicio</p>
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-xs sm:text-sm text-gray-400 px-2">
+          <p className="leading-relaxed">
+            &copy; 2025 Empaques & Fundas. Todos los derechos reservados.
+          </p>
+          <p className="mt-1">Política de Privacidad · Términos de Servicio</p>
         </div>
       </div>
     </footer>

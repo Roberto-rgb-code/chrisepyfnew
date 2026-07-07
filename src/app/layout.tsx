@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   description: 'Fundas personalizadas de la más alta calidad. Protege tu dispositivo con estilo único.',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -21,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className} style={{ backgroundColor: '#f8fafc', margin: 0, padding: 0 }}>
+      <body className={`${inter.className} pb-20 sm:pb-0`} style={{ backgroundColor: '#f8fafc', margin: 0, padding: 0 }}>
         <AuthProvider>
           <CartProvider>
             <ToastProvider>

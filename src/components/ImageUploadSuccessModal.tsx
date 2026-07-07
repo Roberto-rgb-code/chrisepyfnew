@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, CheckCircle } from 'lucide-react';
+import { X, CheckCircle } from '@/components/icons';
 
 interface ImageUploadSuccessModalProps {
   isOpen: boolean;

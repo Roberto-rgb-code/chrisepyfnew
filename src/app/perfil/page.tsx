@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { User, Mail, Calendar } from 'lucide-react';
+import { User, Mail, Calendar } from '@/components/icons';
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();

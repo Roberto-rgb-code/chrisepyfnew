@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MessageCircle, X, Phone, Mail } from 'lucide-react';
+import { MessageCircle, X, Phone, Mail } from '@/components/icons';
 
 export default function WhatsAppWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +23,7 @@ export default function WhatsAppWidget() {
   return (
     <>
       {/* Widget flotante */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bottom-safe">
         {/* Botón principal */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -34,7 +34,7 @@ export default function WhatsAppWidget() {
 
         {/* Menú desplegable */}
         {isOpen && (
-          <div className="absolute bottom-16 right-0 bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-80 animate-fade-in">
+          <div className="absolute bottom-16 right-0 sm:right-0 left-auto bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-[min(20rem,calc(100vw-2rem))] animate-fade-in">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -94,7 +94,7 @@ export default function WhatsAppWidget() {
       {/* Overlay para cerrar al hacer clic fuera */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-40 bg-black/20 sm:bg-transparent"
           onClick={() => setIsOpen(false)}
         />
       )}

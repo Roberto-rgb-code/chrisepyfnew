@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { Smartphone, Search, ShoppingCart, User, Menu, Shield, X } from 'lucide-react';
+import { Smartphone, Search, ShoppingCart, User, Menu, Shield, X } from '@/components/icons';
 import { useState } from 'react';
 import AuthModal from './AuthModal';
 import AnnouncementBar from './AnnouncementBar';
