@@ -77,8 +77,11 @@ export async function sendOrderEmail(
         content_id: att.cid,
       }));
 
+  const fromAddress =
+    process.env.RESEND_FROM || 'Empaques & Fundas <noreply@empaquesyfundas.com>';
+
   const { data, error } = await resend.emails.send({
-    from: 'Empaques & Fundas <noreply@empaquesyfundas.com>',
+    from: fromAddress,
     to: [customerEmail],
     subject: emailTemplate.subject,
     html: emailTemplate.html,
@@ -87,7 +90,11 @@ export async function sendOrderEmail(
 
   if (error) {
     console.error('Error sending email:', error);
-    throw error;
+    const message =
+      typeof error === 'object' && error && 'message' in error
+        ? String((error as { message?: string }).message)
+        : 'Error enviando email';
+    throw new Error(message);
   }
 
   return data;

@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error en test-email API:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Error interno del servidor';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
