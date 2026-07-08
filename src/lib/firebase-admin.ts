@@ -1,42 +1,53 @@
-import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
-import { getAuth, type DecodedIdToken } from 'firebase-admin/auth';
-
-let adminApp: App | null | undefined;
-
-function getAdminApp(): App | null {
-  if (adminApp !== undefined) return adminApp;
-
-  if (getApps().length > 0) {
-    adminApp = getApps()[0]!;
-    return adminApp;
-  }
-
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-  if (!projectId || !clientEmail || !privateKey) {
-    adminApp = null;
-    return null;
-  }
-
-  adminApp = initializeApp({
-    credential: cert({ projectId, clientEmail, privateKey }),
-  });
-
-  return adminApp;
+export interface DecodedIdToken {
+  uid: string;
+  email?: string;
+  email_verified?: boolean;
 }
 
+const FIREBASE_JWKS_URL =
+  'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
+
+type FirebaseJwks = Awaited<ReturnType<typeof loadFirebaseJwks>>;
+
+let jwksPromise: Promise<FirebaseJwks> | null = null;
+
+async function loadFirebaseJwks() {
+  const { createRemoteJWKSet } = await import('jose');
+  return createRemoteJWKSet(new URL(FIREBASE_JWKS_URL));
+}
+
+function getFirebaseJwks() {
+  if (!jwksPromise) {
+    jwksPromise = loadFirebaseJwks();
+  }
+  return jwksPromise;
+}
+
+/** Token verification only needs the Firebase project ID (public JWKS). */
 export function isFirebaseAdminConfigured(): boolean {
-  return getAdminApp() !== null;
+  return Boolean(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
 }
 
 export async function verifyFirebaseIdToken(idToken: string): Promise<DecodedIdToken | null> {
-  const app = getAdminApp();
-  if (!app) return null;
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  if (!projectId) return null;
 
   try {
-    return await getAuth(app).verifyIdToken(idToken);
+    const { jwtVerify } = await import('jose');
+    const jwks = await getFirebaseJwks();
+    const { payload } = await jwtVerify(idToken, jwks, {
+      issuer: `https://securetoken.google.com/${projectId}`,
+      audience: projectId,
+    });
+
+    if (!payload.sub) return null;
+
+    return {
+      uid: payload.sub,
+      email: typeof payload.email === 'string' ? payload.email : undefined,
+      email_verified:
+        typeof payload.email_verified === 'boolean' ? payload.email_verified : undefined,
+    };
   } catch {
     return null;
   }
