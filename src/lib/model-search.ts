@@ -54,7 +54,7 @@ export function filterPhoneModels(query: string, limit = 8): PhoneModel[] {
       return { model, score };
     })
     .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score || a.model.modelName.localeCompare(b.model.modelName));
+    .sort((a, b) => b.score - a.score || a.model.modelName.localeCompare(b.model.modelName, 'es', { sensitivity: 'base' }));
 
   return scored.slice(0, limit).map(({ model }) => model);
 }

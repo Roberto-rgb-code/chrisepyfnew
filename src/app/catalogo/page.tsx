@@ -39,18 +39,18 @@ function CatalogoContent() {
     .sort((a, b) => {
       switch (sortBy) {
         case 'name-asc':
-          return a.modelName.localeCompare(b.modelName);
+          return a.modelName.localeCompare(b.modelName, 'es', { sensitivity: 'base' });
         case 'name-desc':
-          return b.modelName.localeCompare(a.modelName);
+          return b.modelName.localeCompare(a.modelName, 'es', { sensitivity: 'base' });
         case 'brand-asc': {
-          const brandCompare = a.brand.localeCompare(b.brand);
+          const brandCompare = a.brand.localeCompare(b.brand, 'es', { sensitivity: 'base' });
           if (brandCompare !== 0) return brandCompare;
-          return a.modelName.localeCompare(b.modelName);
+          return a.modelName.localeCompare(b.modelName, 'es', { sensitivity: 'base' });
         }
         case 'brand-desc': {
-          const brandCompareDesc = b.brand.localeCompare(a.brand);
+          const brandCompareDesc = b.brand.localeCompare(a.brand, 'es', { sensitivity: 'base' });
           if (brandCompareDesc !== 0) return brandCompareDesc;
-          return a.modelName.localeCompare(b.modelName);
+          return b.modelName.localeCompare(a.modelName, 'es', { sensitivity: 'base' });
         }
         case 'newest':
           return b.id.localeCompare(a.id);

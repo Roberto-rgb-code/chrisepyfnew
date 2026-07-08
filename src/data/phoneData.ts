@@ -75,5 +75,11 @@ export const phoneData: PhoneModel[] = [
   { "id": "ip17air", "modelName": "iPhone 17 Air", "colorURL": "/downloaded_images/ip17air_c002_color.png", "maskURL": "/downloaded_images/ip17air_c002_mask.png", "brand": "Apple" },
   { "id": "ip17pro", "modelName": "iPhone 17 Pro", "colorURL": "/downloaded_images/ip17pro_c002_color.png", "maskURL": "/downloaded_images/ip17pro_c002_mask.png", "brand": "Apple" },
   { "id": "ip17promax", "modelName": "iPhone 17 Pro Max", "colorURL": "/downloaded_images/ip17promax_c002_color.png", "maskURL": "/downloaded_images/ip17promax_c002_mask.png", "brand": "Apple" }
-];
+].sort((a, b) => a.modelName.localeCompare(b.modelName, 'es', { sensitivity: 'base' }));
+
+export function sortPhoneModels(models: PhoneModel[]): PhoneModel[] {
+  return [...models].sort((a, b) =>
+    a.modelName.localeCompare(b.modelName, 'es', { sensitivity: 'base' })
+  );
+}
 
