@@ -55,7 +55,7 @@ export default function AuthWarningModal({ isOpen, onClose, onLogin }: AuthWarni
           </button>
           <button
             onClick={onLogin}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-semibold shadow-md"
+            className="flex-1 px-6 py-3 bg-brand-red text-white rounded-lg hover:bg-brand-red-dark transition-all font-semibold shadow-md"
           >
             Iniciar Sesión
           </button>

@@ -33,7 +33,7 @@ export default function ConfirmationModal({
       case 'warning':
         return <X className="w-8 h-8 text-orange-600" />;
       default:
-        return <ShoppingCart className="w-8 h-8 text-blue-600" />;
+        return <ShoppingCart className="w-8 h-8 text-brand-red" />;
     }
   };
 
@@ -44,7 +44,7 @@ export default function ConfirmationModal({
       case 'warning':
         return 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700';
       default:
-        return 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700';
+        return 'bg-brand-red hover:bg-brand-red-dark';
     }
   };
 
@@ -66,7 +66,7 @@ export default function ConfirmationModal({
 
         {/* Icono */}
         <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-white to-brand-red-light rounded-full flex items-center justify-center">
             {getIcon()}
           </div>
         </div>

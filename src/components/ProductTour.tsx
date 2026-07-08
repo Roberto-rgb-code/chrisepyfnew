@@ -88,7 +88,7 @@ export default function ProductTour() {
   return (
     <button
       onClick={() => startProductTour(true)}
-      className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl hover:border-blue-300 transition-all text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 bottom-safe max-w-[calc(100vw-5rem)]"
+      className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl hover:border-red-200 transition-all text-xs sm:text-sm font-medium text-gray-700 hover:text-brand-red bottom-safe max-w-[calc(100vw-5rem)]"
       title="Ver tour guiado"
     >
       <HelpCircle className="w-5 h-5" />

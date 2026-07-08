@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth as firebaseAuth } from '@/lib/firebase';
-import { Smartphone, X } from '@/components/icons';
+import { X } from '@/components/icons';
+import { BRAND_LOGO, BRAND_NAME, BRAND_TAGLINE } from '@/lib/brand';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -117,11 +119,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
         </button>
 
         {/* Logo */}
-        <div className="flex items-center justify-center space-x-3 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-            <Smartphone className="w-7 h-7 text-white" />
-          </div>
-          <span className="logo-text text-2xl">Empaques & Fundas</span>
+        <div className="flex items-center justify-center mb-6">
+          <Image
+            src={BRAND_LOGO}
+            alt={`${BRAND_NAME} - ${BRAND_TAGLINE}`}
+            width={180}
+            height={52}
+            className="h-12 w-auto object-contain"
+          />
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
@@ -148,7 +153,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
                 placeholder="Tu nombre"
                 required
               />
@@ -164,7 +169,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
               placeholder="tu@email.com"
               required
             />
@@ -179,7 +184,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
               placeholder="••••••••"
               required
             />
@@ -195,7 +200,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
                 id="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-transparent"
                 placeholder="••••••••"
                 required
               />
@@ -210,7 +215,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
               </label>
               <button
                 type="button"
-                className="text-blue-600 hover:text-blue-700"
+                className="text-brand-red hover:text-brand-red-dark"
                 onClick={async () => {
                   if (!email) { setError('Ingresa tu email primero'); return; }
                   try {
@@ -230,7 +235,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50"
+            className="w-full bg-brand-red text-white py-3 rounded-lg font-semibold hover:bg-brand-red-dark transition-all disabled:opacity-50"
           >
             {loading 
               ? (mode === 'login' ? 'Iniciando sesión...' : 'Creando cuenta...') 
@@ -247,7 +252,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
                 setMode(mode === 'login' ? 'register' : 'login');
                 setError('');
               }}
-              className="text-blue-600 hover:text-blue-700 font-semibold"
+              className="text-brand-red hover:text-brand-red-dark font-semibold"
             >
               {mode === 'login' ? 'Regístrate aquí' : 'Inicia sesión'}
             </button>

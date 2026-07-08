@@ -8,7 +8,7 @@ const SUCCESS_LOTTIE_URL =
 export default function SuccessAnimation() {
   return (
     <div className="relative w-full max-w-[min(220px,70vw)] sm:max-w-[220px] mx-auto aspect-square flex items-center justify-center">
-      <div className="absolute inset-0 bg-gradient-to-br from-green-200/40 via-blue-200/30 to-purple-200/40 rounded-full blur-2xl scale-110" />
+      <div className="absolute inset-0 bg-gradient-to-br from-green-200/40 via-red-100/30 to-white/40 rounded-full blur-2xl scale-110" />
       <DotLottieReact
         src={SUCCESS_LOTTIE_URL}
         loop

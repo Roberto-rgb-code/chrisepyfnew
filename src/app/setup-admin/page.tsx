@@ -76,7 +76,7 @@ export default function SetupAdminPage() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 bg-brand-red rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-4xl">🛡️</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Configurar Admin</h1>
@@ -102,7 +102,7 @@ export default function SetupAdminPage() {
             status.includes('✅') ? 'bg-green-50 text-green-800' :
             status.includes('❌') ? 'bg-red-50 text-red-800' :
             status.includes('⚠️') ? 'bg-yellow-50 text-yellow-800' :
-            'bg-blue-50 text-blue-800'
+            'bg-brand-red-light text-blue-800'
           }`}>
             {status}
           </div>
@@ -114,7 +114,7 @@ export default function SetupAdminPage() {
           className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all ${
             loading || success
               ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
+              : 'bg-brand-red hover:bg-brand-red-dark'
           }`}
         >
           {loading ? '⏳ Procesando...' : success ? '✅ Completado' : '🚀 Crear Admin'}

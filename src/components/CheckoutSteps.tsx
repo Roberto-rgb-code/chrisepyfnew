@@ -19,7 +19,7 @@ export default function CheckoutSteps({ current }: CheckoutStepsProps) {
             <div
               className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-colors ${
                 current >= step.num
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
+                  ? 'bg-brand-red text-white shadow-md'
                   : 'bg-gray-200 text-gray-500'
               }`}
             >
@@ -37,7 +37,7 @@ export default function CheckoutSteps({ current }: CheckoutStepsProps) {
           {index < steps.length - 1 && (
             <div
               className={`w-4 sm:w-12 h-0.5 mx-0.5 sm:mx-0 ${
-                current > step.num ? 'bg-blue-500' : 'bg-gray-200'
+                current > step.num ? 'bg-brand-red-light0' : 'bg-gray-200'
               }`}
             />
           )}

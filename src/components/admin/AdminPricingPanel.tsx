@@ -177,7 +177,7 @@ export default function AdminPricingPanel() {
                 onChange={(e) =>
                   setSettings({ ...settings, basePriceMxn: Number(e.target.value) })
                 }
-                className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">MXN</span>
             </div>
@@ -190,7 +190,7 @@ export default function AdminPricingPanel() {
               type="checkbox"
               checked={settings.promoActive}
               onChange={(e) => setSettings({ ...settings, promoActive: e.target.checked })}
-              className="w-5 h-5 rounded border-gray-300 text-blue-600"
+              className="w-5 h-5 rounded border-gray-300 text-brand-red"
             />
             <span className="font-semibold text-gray-800">Activar promoción global en la tienda</span>
           </label>
@@ -233,7 +233,7 @@ export default function AdminPricingPanel() {
         <button
           onClick={savePricing}
           disabled={saving}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50"
+          className="bg-brand-red text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50"
         >
           {saving ? 'Guardando...' : 'Guardar precios y promoción'}
         </button>
@@ -283,7 +283,7 @@ export default function AdminPricingPanel() {
           <button
             onClick={() => createPromoCode(false)}
             disabled={creatingCode || !newCode.trim()}
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-50"
+            className="bg-brand-red text-white px-5 py-2.5 rounded-xl font-medium disabled:opacity-50"
           >
             {creatingCode ? 'Creando...' : 'Crear código'}
           </button>
@@ -298,7 +298,7 @@ export default function AdminPricingPanel() {
           <button
             type="button"
             onClick={() => setNewCode(generatePromoCode())}
-            className="text-sm text-blue-600 font-medium px-2"
+            className="text-sm text-brand-red font-medium px-2"
           >
             Sugerir código
           </button>
@@ -355,7 +355,7 @@ export default function AdminPricingPanel() {
                     <td className="py-3">
                       <button
                         onClick={() => toggleCode(code.id, !code.active)}
-                        className="text-blue-600 hover:underline"
+                        className="text-brand-red hover:underline"
                       >
                         {code.active ? 'Desactivar' : 'Activar'}
                       </button>

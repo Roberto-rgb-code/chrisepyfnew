@@ -58,7 +58,7 @@ export default function AnnouncementBar() {
   if (!current) return null;
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-2.5 sm:py-2 px-3 text-xs sm:text-sm font-medium overflow-hidden relative">
+    <div className="bg-brand-red text-white text-center py-2.5 sm:py-2 px-3 text-xs sm:text-sm font-medium overflow-hidden relative">
       <div
         className={`transition-all duration-500 px-1 max-w-full ${
           isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'

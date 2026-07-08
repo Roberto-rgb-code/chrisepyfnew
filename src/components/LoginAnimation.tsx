@@ -8,7 +8,7 @@ const LOGIN_LOTTIE_URL =
 export default function LoginAnimation() {
   return (
     <div className="relative w-full max-w-[min(200px,60vw)] sm:max-w-[180px] mx-auto aspect-square flex items-center justify-center">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-200/40 via-purple-200/30 to-pink-200/40 rounded-full blur-2xl scale-110" />
+      <div className="absolute inset-0 bg-gradient-to-br from-red-200/40 via-red-100/30 to-white/40 rounded-full blur-2xl scale-110" />
       <DotLottieReact
         src={LOGIN_LOTTIE_URL}
         loop

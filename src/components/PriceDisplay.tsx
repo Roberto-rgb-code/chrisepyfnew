@@ -30,7 +30,7 @@ export default function PriceDisplay({ size = 'md', showSubtitle = true }: Price
           <div className="text-sm text-gray-500 line-through mb-1">{formattedBase}</div>
           <div className={`price-amount text-green-600 ${sizeClass}`}>{formattedEffective}</div>
           {promo.title && (
-            <div className="text-xs font-semibold text-purple-600 mt-1">{promo.title}</div>
+            <div className="text-xs font-semibold text-brand-red mt-1">{promo.title}</div>
           )}
         </>
       ) : (

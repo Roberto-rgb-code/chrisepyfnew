@@ -44,7 +44,7 @@ function SuccessContent() {
             <p className="text-gray-600 mb-6">No encontramos información de tu pago.</p>
             <button
               onClick={() => router.push('/')}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold"
+              className="w-full bg-brand-red text-white py-3 rounded-xl font-semibold"
             >
               Volver al inicio
             </button>
@@ -58,7 +58,7 @@ function SuccessContent() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 py-10 sm:py-14 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-brand-red-light to-white py-10 sm:py-14 px-4">
         <div className="max-w-lg mx-auto">
           <CheckoutSteps current={3} />
 
@@ -83,14 +83,14 @@ function SuccessContent() {
               {orderNumber && (
                 <p className="text-base sm:text-lg text-gray-600 mb-1">
                   Pedido{' '}
-                  <span className="font-bold text-blue-600 tracking-wide">#{orderNumber}</span>
+                  <span className="font-bold text-brand-red tracking-wide">#{orderNumber}</span>
                 </p>
               )}
               <p className="text-gray-500 text-sm sm:text-base mb-8">
                 Tu pago fue procesado de forma segura. Ya estamos preparando tu funda.
               </p>
 
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-5 sm:p-6 mb-8 text-left space-y-4">
+              <div className="bg-gradient-to-r from-white to-brand-red-light rounded-2xl p-5 sm:p-6 mb-8 text-left space-y-4">
                 {[
                   {
                     icon: Mail,
@@ -110,7 +110,7 @@ function SuccessContent() {
                 ].map(({ icon: Icon, title, text }) => (
                   <div key={title} className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-4 h-4 text-blue-600" />
+                      <Icon className="w-4 h-4 text-brand-red" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{title}</p>
@@ -123,7 +123,7 @@ function SuccessContent() {
               <div className="space-y-3">
                 <button
                   onClick={() => router.push('/ordenes')}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
+                  className="w-full bg-brand-red text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
                 >
                   Ver mis órdenes
                 </button>

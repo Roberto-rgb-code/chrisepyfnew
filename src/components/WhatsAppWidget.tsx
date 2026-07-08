@@ -71,7 +71,7 @@ export default function WhatsAppWidget() {
               {/* Llamada */}
               <button
                 onClick={handleCallClick}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl flex items-center space-x-3 transition-all duration-300 hover:shadow-lg"
+                className="w-full bg-brand-red-light0 hover:bg-brand-red text-white py-3 px-4 rounded-xl flex items-center space-x-3 transition-all duration-300 hover:shadow-lg"
               >
                 <Phone className="w-5 h-5" />
                 <div className="text-left">

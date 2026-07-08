@@ -123,7 +123,7 @@ export default function AdminAnnouncementsPanel() {
                     type="checkbox"
                     checked={msg.active}
                     onChange={(e) => updateMessage(index, 'active', e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600"
+                    className="rounded border-gray-300 text-brand-red"
                   />
                   Activo
                 </label>
@@ -160,7 +160,7 @@ export default function AdminAnnouncementsPanel() {
                 />
               </div>
             </div>
-            <div className="mt-3 p-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs sm:text-sm text-center truncate">
+            <div className="mt-3 p-2.5 rounded-lg bg-brand-red text-white text-xs sm:text-sm text-center truncate">
               Vista previa: <span className="sm:hidden">{msg.mobile}</span>
               <span className="hidden sm:inline">{msg.desktop}</span>
             </div>
@@ -179,7 +179,7 @@ export default function AdminAnnouncementsPanel() {
         <button
           type="button"
           onClick={restoreDefaults}
-          className="px-4 py-2.5 text-blue-600 font-medium hover:underline"
+          className="px-4 py-2.5 text-brand-red font-medium hover:underline"
         >
           Restaurar originales
         </button>
@@ -187,7 +187,7 @@ export default function AdminAnnouncementsPanel() {
           type="button"
           onClick={save}
           disabled={saving}
-          className="ml-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2.5 rounded-xl font-semibold disabled:opacity-50"
+          className="ml-auto bg-brand-red text-white px-6 py-2.5 rounded-xl font-semibold disabled:opacity-50"
         >
           {saving ? 'Guardando...' : 'Guardar anuncios'}
         </button>

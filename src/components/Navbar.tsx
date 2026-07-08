@@ -1,14 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { Smartphone, ShoppingCart, User, Menu, Shield, X } from '@/components/icons';
+import { ShoppingCart, User, Menu, Shield, X } from '@/components/icons';
 import { useState } from 'react';
 import AuthModal from './AuthModal';
 import AnnouncementBar from './AnnouncementBar';
 import ModelSearchBox from './ModelSearchBox';
+import { BRAND_LOGO, BRAND_NAME, BRAND_TAGLINE } from '@/lib/brand';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -33,11 +35,15 @@ export default function Navbar() {
       <header className="navbar">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                <Smartphone className="w-6 h-6 text-white" />
-              </div>
-              <span className="logo-text hidden sm:inline">Empaques & Fundas</span>
+            <Link href="/" className="flex items-center shrink-0 min-w-0">
+              <Image
+                src={BRAND_LOGO}
+                alt={`${BRAND_NAME} - ${BRAND_TAGLINE}`}
+                width={180}
+                height={52}
+                className="h-10 sm:h-11 w-auto object-contain"
+                priority
+              />
             </Link>
 
             <div className="hidden md:flex items-center space-x-1">
@@ -45,7 +51,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`nav-link px-4 py-2 rounded-lg transition-colors ${isActive(link.href) ? 'active bg-blue-50 text-blue-700' : ''}`}
+                  className={`nav-link px-4 py-2 rounded-lg transition-colors ${isActive(link.href) ? 'active bg-brand-red-light text-brand-red' : ''}`}
                 >
                   {link.label}
                 </Link>
@@ -60,7 +66,7 @@ export default function Navbar() {
               <Link
                 href="/carrito"
                 data-tour="cart-nav"
-                className="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                className="relative p-2.5 text-gray-600 hover:text-brand-red hover:bg-brand-red-light rounded-xl transition-all"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {getCartCount() > 0 && (
@@ -73,9 +79,9 @@ export default function Navbar() {
                   <>
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                      className="flex items-center gap-2 p-2 text-gray-600 hover:text-brand-red hover:bg-brand-red-light rounded-xl transition-all"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                      <div className="w-8 h-8 bg-brand-red rounded-full flex items-center justify-center text-white text-sm font-bold">
                         {(user.displayName || user.email || 'U')[0].toUpperCase()}
                       </div>
                       <span className="hidden lg:block text-sm font-medium max-w-[120px] truncate">
@@ -85,13 +91,13 @@ export default function Navbar() {
                     {showUserMenu && (
                       <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100">
                         {isAdmin && (
-                          <Link href="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm text-purple-700 hover:bg-purple-50 font-medium" onClick={() => setShowUserMenu(false)}>
+                          <Link href="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm text-brand-red hover:bg-brand-red-light font-medium" onClick={() => setShowUserMenu(false)}>
                             <Shield className="w-4 h-4" /> Panel Admin
                           </Link>
                         )}
                         <Link href="/perfil" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowUserMenu(false)}>Mi Perfil</Link>
                         <Link href="/ordenes" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setShowUserMenu(false)}>Mis Órdenes</Link>
-                        <button onClick={() => { logout(); setShowUserMenu(false); }} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                        <button onClick={() => { logout(); setShowUserMenu(false); }} className="w-full text-left px-4 py-2.5 text-sm text-brand-red hover:bg-brand-red-light">
                           Cerrar Sesión
                         </button>
                       </div>
@@ -100,7 +106,7 @@ export default function Navbar() {
                 ) : (
                   <button
                     onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
-                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:shadow-md transition-all"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-brand-red text-white rounded-xl text-sm font-medium hover:bg-brand-red-dark hover:shadow-md transition-all"
                   >
                     <User className="w-4 h-4" />
                     <span className="hidden sm:inline">Entrar</span>
@@ -123,7 +129,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block px-4 py-3 rounded-lg font-medium ${isActive(link.href) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
+                  className={`block px-4 py-3 rounded-lg font-medium ${isActive(link.href) ? 'bg-brand-red-light text-brand-red' : 'text-gray-700'}`}
                   onClick={() => setShowMobileMenu(false)}
                 >
                   {link.label}

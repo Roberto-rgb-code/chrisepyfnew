@@ -38,7 +38,7 @@ function HighlightMatch({ text, query }: { text: string; query: string }) {
   return (
     <>
       {text.slice(0, idx)}
-      <span className="font-semibold text-blue-600">{text.slice(idx, idx + q.length)}</span>
+      <span className="font-semibold text-brand-red">{text.slice(idx, idx + q.length)}</span>
       {text.slice(idx + q.length)}
     </>
   );
@@ -285,7 +285,7 @@ export default function ModelSearchBox({
                       clearSearchHistory();
                       refreshHistory();
                     }}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-xs text-brand-red hover:text-brand-red-dark font-medium"
                   >
                     Borrar todo
                   </button>
@@ -298,7 +298,7 @@ export default function ModelSearchBox({
                       role="option"
                       aria-selected={activeIndex === globalIdx}
                       className={`flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
-                        activeIndex === globalIdx ? 'bg-blue-50' : ''
+                        activeIndex === globalIdx ? 'bg-brand-red-light' : ''
                       }`}
                     >
                       <button
@@ -348,7 +348,7 @@ export default function ModelSearchBox({
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => selectItem({ kind: 'model', value: model })}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${
-                        activeIndex === globalIdx ? 'bg-blue-50' : ''
+                        activeIndex === globalIdx ? 'bg-brand-red-light' : ''
                       }`}
                     >
                       <div className="relative w-9 h-9 bg-gray-50 rounded-lg flex-shrink-0 overflow-hidden">
@@ -372,11 +372,11 @@ export default function ModelSearchBox({
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => navigateToCatalog(query)}
-                className="w-full flex items-center gap-3 px-4 py-3 border-t border-gray-100 text-left hover:bg-blue-50 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 border-t border-gray-100 text-left hover:bg-brand-red-light transition-colors"
               >
-                <Search className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                <Search className="w-4 h-4 text-brand-red flex-shrink-0" />
                 <span className="text-sm text-gray-700">
-                  Buscar <strong className="text-blue-600">&quot;{query.trim()}&quot;</strong> en catálogo
+                  Buscar <strong className="text-brand-red">&quot;{query.trim()}&quot;</strong> en catálogo
                 </span>
               </button>
             )}

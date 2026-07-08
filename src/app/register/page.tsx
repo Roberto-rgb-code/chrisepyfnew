@@ -42,7 +42,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-brand-red-light to-white flex items-center justify-center p-4 py-8">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 sm:p-8 border border-gray-100 overflow-hidden">
         <div className="mb-4">
           <RegisterAnimation />
@@ -51,16 +51,16 @@ function RegisterForm() {
         <p className="text-gray-500 text-center mb-6">Regístrate en segundos y compra tu funda</p>
         {error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl mb-4 text-sm">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre completo" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500" required />
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo electrónico" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500" required />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña (mín. 6 caracteres)" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500" required />
-          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirmar contraseña" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500" required />
-          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold disabled:opacity-50">
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre completo" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red" required />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo electrónico" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red" required />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña (mín. 6 caracteres)" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red" required />
+          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirmar contraseña" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red" required />
+          <button type="submit" disabled={loading} className="w-full bg-brand-red text-white py-3.5 rounded-xl font-semibold disabled:opacity-50">
             {loading ? 'Creando cuenta...' : 'Crear cuenta gratis'}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
-          ¿Ya tienes cuenta? <Link href={`/login?returnUrl=${encodeURIComponent(returnUrl)}`} className="text-blue-600 font-semibold">Inicia sesión</Link>
+          ¿Ya tienes cuenta? <Link href={`/login?returnUrl=${encodeURIComponent(returnUrl)}`} className="text-brand-red font-semibold">Inicia sesión</Link>
         </p>
       </div>
     </div>

@@ -44,7 +44,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-brand-red-light to-white flex items-center justify-center p-4 py-8">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 sm:p-8 border border-gray-100 overflow-hidden">
         <div className="mb-4">
           <LoginAnimation />
@@ -58,13 +58,13 @@ function LoginForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Correo electrónico</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="tu@email.com" required />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red focus:border-transparent" placeholder="tu@email.com" required />
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="••••••••" required />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-red focus:border-transparent" placeholder="••••••••" required />
           </div>
-          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+          <button type="submit" disabled={loading} className="w-full bg-brand-red text-white py-3.5 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2">
             {loading ? 'Iniciando sesión...' : <>Iniciar sesión <ArrowRight className="w-4 h-4" /></>}
           </button>
         </form>
@@ -72,7 +72,7 @@ function LoginForm() {
         <div className="mt-6 text-center space-y-2">
           <p className="text-gray-600 text-sm">
             ¿No tienes cuenta?{' '}
-            <Link href={`/register?returnUrl=${encodeURIComponent(returnUrl)}`} className="text-blue-600 font-semibold hover:underline">Regístrate gratis</Link>
+            <Link href={`/register?returnUrl=${encodeURIComponent(returnUrl)}`} className="text-brand-red font-semibold hover:underline">Regístrate gratis</Link>
           </p>
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">← Volver al inicio</Link>
         </div>

@@ -344,7 +344,7 @@ export default function AdminPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-red text-white'
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
                 }`}
               >
@@ -364,7 +364,7 @@ export default function AdminPage() {
                   <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-lg">
-                  <ShoppingBag className="w-6 h-6 text-blue-600" />
+                  <ShoppingBag className="w-6 h-6 text-brand-red" />
                 </div>
               </div>
             </div>
@@ -409,10 +409,10 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Con Diseños</p>
-                  <p className="text-2xl font-bold text-purple-600">{stats.customDesigns}</p>
+                  <p className="text-2xl font-bold text-brand-red">{stats.customDesigns}</p>
                 </div>
                 <div className="p-3 bg-purple-100 rounded-lg">
-                  <ImageIcon className="w-6 h-6 text-purple-600" />
+                  <ImageIcon className="w-6 h-6 text-brand-red" />
                 </div>
               </div>
             </div>
@@ -421,10 +421,10 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Promedio</p>
-                  <p className="text-2xl font-bold text-blue-600">${stats.avgOrderValue.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-brand-red">${stats.avgOrderValue.toFixed(2)}</p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-blue-600" />
+                  <TrendingUp className="w-6 h-6 text-brand-red" />
                 </div>
               </div>
             </div>
@@ -443,14 +443,14 @@ export default function AdminPage() {
                     placeholder="Buscar por email, orden..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   />
                 </div>
                 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                 >
                   <option value="all">Todos los estados</option>
                   <option value="confirmed">Confirmados</option>
@@ -463,7 +463,7 @@ export default function AdminPage() {
               
               <button
                 onClick={loadOrders}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-red text-white rounded-lg hover:bg-brand-red-dark transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 Actualizar
@@ -530,7 +530,7 @@ export default function AdminPage() {
                                   #{order.orderId?.slice(-8) || order.id.slice(-8)}
                                 </p>
                                 {order.hasCustomDesigns && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-purple-600">
+                                  <span className="inline-flex items-center gap-1 text-xs text-brand-red">
                                     <ImageIcon className="w-3 h-3" />
                                     Personalizado
                                   </span>
@@ -565,7 +565,7 @@ export default function AdminPage() {
                             <select
                               value={order.status}
                               onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                              className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-red"
                             >
                               <option value="confirmed">Confirmado</option>
                               <option value="processing">En Proceso</option>
@@ -597,7 +597,7 @@ export default function AdminPage() {
                                       {/* Header del item */}
                                       <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
                                         <div className="p-2 bg-blue-100 rounded-lg">
-                                          <Smartphone className="w-5 h-5 text-blue-600" />
+                                          <Smartphone className="w-5 h-5 text-brand-red" />
                                         </div>
                                         <div>
                                           <h5 className="text-lg font-bold text-gray-900">{item.modelName || 'Modelo desconocido'}</h5>
@@ -658,7 +658,7 @@ export default function AdminPage() {
                                         {item.customImage ? (
                                           <div className="space-y-4">
                                             <div className="flex items-center gap-2">
-                                              <ImageIcon className="w-5 h-5 text-purple-600" />
+                                              <ImageIcon className="w-5 h-5 text-brand-red" />
                                               <p className="text-sm font-medium text-gray-700">🎨 Imagen Personalizada</p>
                                             </div>
                                             
@@ -684,7 +684,7 @@ export default function AdminPage() {
                                                     link.click();
                                                     document.body.removeChild(link);
                                                   }}
-                                                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                                                  className="flex items-center gap-2 px-3 py-2 bg-brand-red text-white text-xs font-medium rounded-lg hover:bg-brand-red-dark transition-colors"
                                                 >
                                                   <Download className="w-4 h-4" />
                                                   Descargar imagen
@@ -715,32 +715,32 @@ export default function AdminPage() {
                                             
                                             {/* Controles de personalización aplicados */}
                                             {item.imageControls && (
-                                              <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                                              <div className="bg-brand-red-light rounded-xl p-4 border border-purple-200">
                                                 <p className="text-xs font-semibold text-purple-800 mb-3">⚙️ Ajustes aplicados por el cliente:</p>
                                                 <div className="grid grid-cols-2 gap-3">
                                                   <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2">
-                                                    <ZoomIn className="w-4 h-4 text-purple-600" />
+                                                    <ZoomIn className="w-4 h-4 text-brand-red" />
                                                     <div>
                                                       <p className="text-xs text-gray-500">Escala</p>
                                                       <p className="text-sm font-bold text-gray-900">{(item.imageControls.scale || 1).toFixed(2)}x</p>
                                                     </div>
                                                   </div>
                                                   <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2">
-                                                    <RotateCw className="w-4 h-4 text-purple-600" />
+                                                    <RotateCw className="w-4 h-4 text-brand-red" />
                                                     <div>
                                                       <p className="text-xs text-gray-500">Rotación</p>
                                                       <p className="text-sm font-bold text-gray-900">{item.imageControls.rotation || 0}°</p>
                                                     </div>
                                                   </div>
                                                   <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2">
-                                                    <FlipHorizontal className="w-4 h-4 text-purple-600" />
+                                                    <FlipHorizontal className="w-4 h-4 text-brand-red" />
                                                     <div>
                                                       <p className="text-xs text-gray-500">Volteo H</p>
                                                       <p className="text-sm font-bold text-gray-900">{item.imageControls.flipX === -1 ? '✅ Sí' : '❌ No'}</p>
                                                     </div>
                                                   </div>
                                                   <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2">
-                                                    <FlipVertical className="w-4 h-4 text-purple-600" />
+                                                    <FlipVertical className="w-4 h-4 text-brand-red" />
                                                     <div>
                                                       <p className="text-xs text-gray-500">Volteo V</p>
                                                       <p className="text-sm font-bold text-gray-900">{item.imageControls.flipY === -1 ? '✅ Sí' : '❌ No'}</p>
@@ -748,7 +748,7 @@ export default function AdminPage() {
                                                   </div>
                                                   {item.imageControls.position && (
                                                     <div className="col-span-2 flex items-center gap-2 bg-white rounded-lg px-3 py-2">
-                                                      <Move className="w-4 h-4 text-purple-600" />
+                                                      <Move className="w-4 h-4 text-brand-red" />
                                                       <div>
                                                         <p className="text-xs text-gray-500">Posición</p>
                                                         <p className="text-sm font-bold text-gray-900">
@@ -821,7 +821,7 @@ export default function AdminPage() {
                     placeholder="Buscar movimientos..."
                     value={activitySearch}
                     onChange={(e) => setActivitySearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   />
                 </div>
               </div>

@@ -112,7 +112,7 @@ function CartContent() {
           <p className="text-gray-600 mb-8">Personaliza tu funda y agrégala aquí cuando estés listo.</p>
           <button
             onClick={() => router.push('/')}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            className="bg-brand-red text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
           >
             Crear mi funda
           </button>
@@ -136,7 +136,7 @@ function CartContent() {
                   <CasePreview item={item} />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base sm:text-lg font-bold text-gray-900">{item.modelName}</h3>
-                    <p className="text-sm text-purple-600 font-medium">🎨 Diseño personalizado</p>
+                    <p className="text-sm text-brand-red font-medium">🎨 Diseño personalizado</p>
                     <p className="text-lg sm:text-xl font-bold text-green-600 mt-2">${item.price} MXN</p>
                   </div>
                 </div>
@@ -213,7 +213,7 @@ function CartContent() {
             <button
               onClick={handleCheckout}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-brand-red text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Lock className="w-4 h-4" />
               {loading ? 'Redirigiendo a pago seguro...' : user ? 'Pagar con Stripe' : 'Iniciar sesión y pagar'}
@@ -236,7 +236,7 @@ function CartContent() {
                 { icon: ShoppingBag, text: 'Email con tu diseño al confirmar' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-2 text-sm text-gray-600">
-                  <Icon className="w-4 h-4 text-blue-500" />
+                  <Icon className="w-4 h-4 text-brand-red" />
                   <span>{text}</span>
                 </div>
               ))}

@@ -83,7 +83,7 @@ export default function OrdersPage() {
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">Sin órdenes aún</h2>
             <p className="text-gray-600 mb-6">Cuando compres, verás aquí tu diseño y el estado del envío.</p>
-            <button onClick={() => router.push('/')} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold">
+            <button onClick={() => router.push('/')} className="bg-brand-red text-white px-6 py-3 rounded-xl font-semibold">
               Personalizar mi funda
             </button>
           </div>
@@ -133,7 +133,7 @@ export default function OrdersPage() {
                           <div>
                             <p className="font-semibold text-gray-900">{item.modelName}</p>
                             <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>
-                            {item.customImage && <p className="text-xs text-purple-600 font-medium mt-1">🎨 Con tu diseño</p>}
+                            {item.customImage && <p className="text-xs text-brand-red font-medium mt-1">🎨 Con tu diseño</p>}
                           </div>
                         </div>
                       ))}

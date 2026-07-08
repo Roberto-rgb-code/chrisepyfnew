@@ -11,8 +11,13 @@ import ProductTour from '@/components/ProductTour';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Empaques & Fundas - Personaliza tu Funda',
+  title: 'EFM LATAM - Empaques y Fundas Móviles',
   description: 'Fundas personalizadas de la más alta calidad. Protege tu dispositivo con estilo único.',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export const viewport = {
@@ -29,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} pb-20 sm:pb-0`} style={{ backgroundColor: '#f8fafc', margin: 0, padding: 0 }}>
+      <body className={`${inter.className} pb-20 sm:pb-0 bg-white`} style={{ margin: 0, padding: 0 }}>
         <AuthProvider>
           <PricingProvider>
             <CartProvider>

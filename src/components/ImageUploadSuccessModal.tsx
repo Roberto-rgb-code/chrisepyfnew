@@ -35,7 +35,7 @@ export default function ImageUploadSuccessModal({ isOpen, onClose }: ImageUpload
           </p>
           <button
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-md"
+            className="w-full bg-brand-red text-white py-3 px-6 rounded-lg hover:bg-brand-red-dark transition-all duration-300 font-semibold shadow-md"
           >
             Entendido
           </button>

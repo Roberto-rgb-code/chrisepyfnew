@@ -47,14 +47,14 @@ export default function ImageWarningModal({ isOpen, onClose }: ImageWarningModal
         {/* Botón */}
         <button
           onClick={onClose}
-          className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-semibold shadow-md flex items-center justify-center space-x-2"
+          className="w-full px-6 py-3 bg-brand-red text-white rounded-lg hover:bg-brand-red-dark transition-all font-semibold shadow-md flex items-center justify-center space-x-2"
         >
           <Upload className="w-5 h-5" />
           <span>Subir Imagen</span>
         </button>
 
         {/* Tips */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+        <div className="mt-6 p-4 bg-gradient-to-r from-white to-brand-red-light rounded-lg border border-blue-200">
           <div className="text-sm text-blue-800">
             <p className="font-medium mb-2">💡 Tips para mejor calidad:</p>
             <ul className="space-y-1 text-xs">

@@ -68,7 +68,7 @@ function CatalogoContent() {
     <>
       <Navbar />
 
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-10 sm:py-16">
+      <div className="bg-brand-red text-white py-10 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
@@ -98,7 +98,7 @@ function CatalogoContent() {
                 <select
                   value={selectedBrand}
                   onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-blue-500"
                 >
                   {brands.map((brand) => (
                     <option key={brand} value={brand}>
@@ -111,7 +111,7 @@ function CatalogoContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red focus:border-blue-500"
               >
                 <option value="name-asc">Nombre (A-Z)</option>
                 <option value="name-desc">Nombre (Z-A)</option>
@@ -126,19 +126,19 @@ function CatalogoContent() {
               <span className="text-sm text-gray-600">
                 {filteredModels.length} modelos encontrados
                 {searchTerm && (
-                  <span className="text-blue-600 font-medium"> · &quot;{searchTerm}&quot;</span>
+                  <span className="text-brand-red font-medium"> · &quot;{searchTerm}&quot;</span>
                 )}
               </span>
               <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                  className={`p-2 ${viewMode === 'grid' ? 'bg-brand-red text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                  className={`p-2 ${viewMode === 'list' ? 'bg-brand-red text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -197,10 +197,10 @@ function CatalogPrice() {
   return onSale ? (
     <div>
       <span className="text-sm text-gray-400 line-through mr-2">{formattedBase}</span>
-      <span className="text-xl sm:text-2xl font-bold text-blue-600">{formattedEffective}</span>
+      <span className="text-xl sm:text-2xl font-bold text-brand-red">{formattedEffective}</span>
     </div>
   ) : (
-    <span className="text-xl sm:text-2xl font-bold text-blue-600">{formattedEffective}</span>
+    <span className="text-xl sm:text-2xl font-bold text-brand-red">{formattedEffective}</span>
   );
 }
 
@@ -214,7 +214,7 @@ function ModelCard({ model }: { model: PhoneModel }) {
           fill
           className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+        <div className="absolute top-3 left-3 bg-brand-red text-white px-2 py-1 rounded-full text-xs font-medium">
           {model.brand}
         </div>
       </div>
@@ -231,7 +231,7 @@ function ModelCard({ model }: { model: PhoneModel }) {
           <CatalogPrice />
           <Link
             href={`/?model=${model.id}`}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm"
+            className="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-brand-red-dark transition-all font-medium text-sm"
           >
             Personalizar
           </Link>
@@ -258,7 +258,7 @@ function ModelListItem({ model }: { model: PhoneModel }) {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+                <span className="bg-brand-red text-white px-2 py-1 rounded-full text-xs font-medium">
                   {model.brand}
                 </span>
                 <h3 className="font-bold text-base sm:text-lg text-gray-800">
@@ -274,7 +274,7 @@ function ModelListItem({ model }: { model: PhoneModel }) {
               <CatalogPrice />
               <Link
                 href={`/?model=${model.id}`}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 sm:px-6 py-2.5 sm:py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm sm:text-base whitespace-nowrap"
+                className="bg-brand-red text-white px-5 sm:px-6 py-2.5 sm:py-2 rounded-lg hover:bg-brand-red-dark transition-all font-medium text-sm sm:text-base whitespace-nowrap"
               >
                 Personalizar
               </Link>

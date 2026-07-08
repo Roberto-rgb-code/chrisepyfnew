@@ -274,7 +274,7 @@ export default function CaseCustomizer({
           </div>
         )}
 
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="mt-4 p-3 bg-brand-red-light rounded-lg border border-blue-200">
           <div className="flex items-start space-x-2">
             <div className="text-xs text-blue-800">
               <p className="font-semibold">Tips para mejor calidad:</p>

@@ -45,7 +45,7 @@ export default function ProfilePage() {
 
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex items-center space-x-6 mb-8">
-            <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-24 h-24 bg-brand-red rounded-full flex items-center justify-center">
               <User className="w-12 h-12 text-white" />
             </div>
             <div>
@@ -58,7 +58,7 @@ export default function ProfilePage() {
 
           <div className="space-y-4">
             <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
-              <User className="w-5 h-5 text-blue-600" />
+              <User className="w-5 h-5 text-brand-red" />
               <div>
                 <p className="text-sm text-gray-600">Nombre</p>
                 <p className="font-semibold">{user.displayName || 'No especificado'}</p>
@@ -66,7 +66,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
-              <Mail className="w-5 h-5 text-blue-600" />
+              <Mail className="w-5 h-5 text-brand-red" />
               <div>
                 <p className="text-sm text-gray-600">Correo electrónico</p>
                 <p className="font-semibold">{user.email}</p>
@@ -74,7 +74,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
-              <Calendar className="w-5 h-5 text-blue-600" />
+              <Calendar className="w-5 h-5 text-brand-red" />
               <div>
                 <p className="text-sm text-gray-600">Miembro desde</p>
                 <p className="font-semibold">
@@ -93,7 +93,7 @@ export default function ProfilePage() {
           <div className="mt-8 space-y-3">
             <button
               onClick={() => router.push('/ordenes')}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+              className="w-full bg-brand-red text-white py-3 rounded-lg font-semibold hover:bg-brand-red-dark transition-all"
             >
               Ver Mis Órdenes
             </button>

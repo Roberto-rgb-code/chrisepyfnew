@@ -18,7 +18,7 @@ export default function LoadingScreen({
   className = '',
 }: LoadingScreenProps) {
   const wrapper = fullScreen
-    ? 'min-h-[50vh] sm:min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50'
+    ? 'min-h-[50vh] sm:min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-gradient-to-br from-white via-brand-red-light to-white'
     : 'flex flex-col items-center justify-center py-12 px-4';
 
   return (
