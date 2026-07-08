@@ -104,6 +104,11 @@ export async function verifyFirebaseIdToken(idToken: string): Promise<DecodedIdT
   }
 }
 
+/** @internal test helper */
+export function resetFirebaseAuthCacheForTests() {
+  certsCache = null;
+}
+
 /** @internal exported for tests */
 export const firebaseAuthInternals = {
   decodeBase64Url,
