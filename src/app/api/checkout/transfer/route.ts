@@ -181,11 +181,20 @@ export async function POST(request: NextRequest) {
           total: promoResult.total,
           items: cartItems,
           date: new Date().toISOString(),
+          shippingDetails: shipping,
         },
         userEmail
       );
     } catch (emailError) {
       console.error('Transfer pending email error:', emailError);
+      return NextResponse.json(
+        {
+          error:
+            'Tu pedido se registró, pero no pudimos enviar el correo de confirmación. Escríbenos a soporte@empaquesyfundas.com con tu número de pedido.',
+          orderId: order.orderId,
+        },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({

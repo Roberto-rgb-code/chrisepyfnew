@@ -24,6 +24,10 @@ export async function sendOrderEmail(
   },
   customerEmail: string
 ) {
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 're_placeholder') {
+    throw new Error('RESEND_API_KEY no configurada');
+  }
+
   const prepared = prepareOrderEmailData(orderData);
 
   let emailTemplate;
@@ -52,20 +56,26 @@ export async function sendOrderEmail(
       break;
     case 'transfer_pending':
       emailTemplate = emailTemplates.transferPending({
-        orderNumber: prepared.orderNumber,
+        orderNumber: orderData.id,
         customerName: prepared.customerName,
         total: prepared.total,
+        date: prepared.date,
+        items: prepared.items,
+        shippingDetails: orderData.shippingDetails,
       });
       break;
     default:
       throw new Error('Invalid email type');
   }
 
-  const attachments = prepared.attachments.map((att) => ({
-    filename: att.filename,
-    content: att.content,
-    content_id: att.cid,
-  }));
+  const skipAttachments = type === 'transfer_pending';
+  const attachments = skipAttachments
+    ? []
+    : prepared.attachments.map((att) => ({
+        filename: att.filename,
+        content: att.content,
+        content_id: att.cid,
+      }));
 
   const { data, error } = await resend.emails.send({
     from: 'Empaques & Fundas <noreply@empaquesyfundas.com>',

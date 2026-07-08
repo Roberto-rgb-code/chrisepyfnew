@@ -1,7 +1,8 @@
 import { EmailReadyItem } from './email-utils';
 import { formatShippingAddress, type ShippingDetails } from './shipping';
+import { BANK_TRANSFER_DETAILS, formatClabe } from './bank-transfer';
 
-const brandGradient = 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)';
+const brandGradient = 'linear-gradient(135deg, #df2f36 0%, #991b1b 100%)';
 
 function renderProducts(items: EmailReadyItem[]) {
   return items
@@ -107,19 +108,61 @@ export const emailTemplates = {
     ),
   }),
 
-  transferPending: (data: { orderNumber: string; customerName: string; total: number }) => ({
-    subject: `🧾 Comprobante recibido #${data.orderNumber} — EFM LATAM`,
+  transferPending: (data: {
+    orderNumber: string;
+    customerName: string;
+    total: number;
+    date: string;
+    items: EmailReadyItem[];
+    shippingDetails?: ShippingDetails;
+  }) => ({
+    subject: `💌 ¡Gracias por tu pedido! #${data.orderNumber} — Empaques & Fundas`,
     html: emailShell(
-      'Recibimos tu comprobante',
-      'Estamos validando tu transferencia',
+      '¡Recibimos tu pedido con mucho cariño!',
+      'Tu comprobante está en nuestras manos',
       `
-      <h2 style="color:#111827;margin-top:0;">Hola ${data.customerName},</h2>
-      <p>Recibimos tu pedido por transferencia bancaria y estamos revisando el comprobante.</p>
-      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;margin:20px 0;">
+      <h2 style="color:#111827;margin-top:0;">Hola ${data.customerName}, 💕</h2>
+      <p style="font-size:16px;line-height:1.7;">
+        <strong>¡Qué emoción!</strong> Acabamos de recibir tu pedido y tu comprobante de transferencia.
+        En <strong>EFM LATAM</strong> ya estamos listos para darle vida a tu funda personalizada.
+      </p>
+      <p style="font-size:15px;color:#4b5563;line-height:1.7;">
+        Sabemos lo especial que es para ti este diseño, y queremos que sepas que lo estamos cuidando
+        como si fuera nuestro. En las próximas <strong>24 horas hábiles</strong> validaremos tu pago
+        y te escribiremos en cuanto quede confirmado para comenzar a fabricarlo con todo nuestro cariño.
+      </p>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;margin:24px 0;">
         <p style="margin:0 0 8px;"><strong>Pedido:</strong> #${data.orderNumber}</p>
-        <p style="margin:0;font-size:18px;color:#991b1b;font-weight:bold;">Total: $${data.total} MXN</p>
+        <p style="margin:0 0 8px;"><strong>Fecha:</strong> ${new Date(data.date).toLocaleDateString('es-MX', { dateStyle: 'long' })}</p>
+        <p style="margin:0;font-size:20px;color:#df2f36;font-weight:bold;">Total: $${data.total} MXN</p>
       </div>
-      <p style="color:#6b7280;">Te avisaremos por correo cuando confirmemos tu pago (24 horas hábiles).</p>`
+      <h3 style="color:#111827;">🛍️ Lo que pronto estará en tus manos</h3>
+      ${renderProducts(data.items)}
+      ${
+        data.shippingDetails
+          ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:20px;margin-top:24px;">
+              <h3 style="color:#9a3412;margin-top:0;">📦 Te lo enviaremos a</h3>
+              <pre style="white-space:pre-wrap;font-family:Inter,Arial,sans-serif;font-size:14px;color:#374151;margin:0;">${formatShippingAddress(data.shippingDetails)}</pre>
+            </div>`
+          : ''
+      }
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-top:24px;">
+        <h3 style="color:#111827;margin-top:0;">🏦 Referencia de tu transferencia</h3>
+        <p style="margin:0 0 8px;"><strong>Banco:</strong> ${BANK_TRANSFER_DETAILS.bankName}</p>
+        <p style="margin:0 0 8px;"><strong>CLABE:</strong> ${formatClabe(BANK_TRANSFER_DETAILS.clabe)}</p>
+        <p style="margin:0;"><strong>No. cuenta:</strong> ${BANK_TRANSFER_DETAILS.accountNumber}</p>
+      </div>
+      <div style="background:#eff6ff;border-radius:12px;padding:20px;margin-top:24px;">
+        <h3 style="color:#1d4ed8;margin-top:0;">✨ ¿Qué sigue?</h3>
+        <ul style="color:#1e40af;padding-left:20px;margin:0;line-height:1.8;">
+          <li>Validamos tu comprobante (máx. 24 h hábiles)</li>
+          <li>Te avisamos por correo cuando tu pago quede confirmado</li>
+          <li>¡Comenzamos a crear tu funda personalizada!</li>
+        </ul>
+      </div>
+      <p style="text-align:center;margin-top:28px;font-size:15px;color:#6b7280;">
+        Gracias por confiar en nosotros. Estamos felices de acompañarte en este pedido. 🤗
+      </p>`
     ),
   }),
 
