@@ -66,4 +66,5 @@ export const FlipVertical = icon('line-md:arrows-vertical-alt');
 export const Move = icon('line-md:my-location-loop');
 export const Activity = icon('line-md:speedometer-loop');
 export const Bell = icon('line-md:bell-twotone');
+export const Building2 = icon('line-md:home-md');
 export const UserCircle = icon('line-md:account-small');

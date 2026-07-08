@@ -1,4 +1,5 @@
 import { EmailReadyItem } from './email-utils';
+import { formatShippingAddress, type ShippingDetails } from './shipping';
 
 const brandGradient = 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)';
 
@@ -58,6 +59,7 @@ export const emailTemplates = {
     total: number;
     date: string;
     items: EmailReadyItem[];
+    shippingDetails?: ShippingDetails;
   }) => ({
     subject: `✅ Pedido confirmado #${data.orderNumber} — Empaques & Fundas`,
     html: emailShell(
@@ -73,6 +75,14 @@ export const emailTemplates = {
       </div>
       <h3 style="color:#111827;">🛍️ Tu pedido</h3>
       ${renderProducts(data.items)}
+      ${
+        data.shippingDetails
+          ? `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;margin-top:24px;">
+              <h3 style="color:#991b1b;margin-top:0;">📦 Datos de entrega</h3>
+              <pre style="white-space:pre-wrap;font-family:Inter,Arial,sans-serif;font-size:14px;color:#374151;margin:0;">${formatShippingAddress(data.shippingDetails)}</pre>
+            </div>`
+          : ''
+      }
       <div style="background:#eff6ff;border-radius:12px;padding:20px;margin-top:24px;">
         <h3 style="color:#1d4ed8;margin-top:0;">📬 Próximos pasos</h3>
         <ul style="color:#1e40af;padding-left:20px;margin:0;">
@@ -94,6 +104,22 @@ export const emailTemplates = {
       <p>Tu pedido <strong>#${data.orderNumber}</strong> está siendo producido.</p>
       ${data.items.some((i) => i.hasCustomDesign) ? renderProducts(data.items.filter((i) => i.hasCustomDesign)) : ''}
       <p style="color:#6b7280;">Tiempo estimado: 1-2 días hábiles.</p>`
+    ),
+  }),
+
+  transferPending: (data: { orderNumber: string; customerName: string; total: number }) => ({
+    subject: `🧾 Comprobante recibido #${data.orderNumber} — EFM LATAM`,
+    html: emailShell(
+      'Recibimos tu comprobante',
+      'Estamos validando tu transferencia',
+      `
+      <h2 style="color:#111827;margin-top:0;">Hola ${data.customerName},</h2>
+      <p>Recibimos tu pedido por transferencia bancaria y estamos revisando el comprobante.</p>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;margin:20px 0;">
+        <p style="margin:0 0 8px;"><strong>Pedido:</strong> #${data.orderNumber}</p>
+        <p style="margin:0;font-size:18px;color:#991b1b;font-weight:bold;">Total: $${data.total} MXN</p>
+      </div>
+      <p style="color:#6b7280;">Te avisaremos por correo cuando confirmemos tu pago (24 horas hábiles).</p>`
     ),
   }),
 

@@ -3,6 +3,11 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { sendOrderEmail } from '@/lib/send-order-email';
 import { formatOrderNumber } from '@/lib/email-utils';
+import {
+  metadataToShippingDetails,
+  shippingDetailsToOrderData,
+  type ShippingDetails,
+} from '@/lib/shipping';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
@@ -80,17 +85,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       customer_email.split('@')[0];
 
     const userId = metadata?.userId && metadata.userId !== 'guest' ? metadata.userId : null;
+    const shippingDetails: ShippingDetails | null = metadata
+      ? metadataToShippingDetails({ ...metadata, customerEmail: customer_email })
+      : null;
+    const shippingData = shippingDetails ? shippingDetailsToOrderData(shippingDetails) : {};
 
     await prisma.order.upsert({
       where: { orderId: session.id },
       update: {
         status: 'confirmed',
         paymentStatus: session.payment_status,
+        paymentMethod: 'stripe',
         amountTotal: (session.amount_total || 0) / 100,
         items: completeItems,
         hasCustomDesigns: completeItems.some((item: any) => item.customImage),
         totalItems: completeItems.length,
         customerName,
+        ...shippingData,
       },
       create: {
         orderId: session.id,
@@ -99,6 +110,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         customerName,
         status: 'confirmed',
         paymentStatus: session.payment_status,
+        paymentMethod: 'stripe',
         amountTotal: (session.amount_total || 0) / 100,
         currency: session.currency || 'mxn',
         items: completeItems,
@@ -106,6 +118,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         totalItems: completeItems.length,
         cartId,
         orderDate: new Date(),
+        ...shippingData,
       },
     });
 
@@ -125,6 +138,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         total: (session.amount_total || 0) / 100,
         items: completeItems,
         date: new Date().toISOString(),
+        shippingDetails: shippingDetails || undefined,
       },
       customer_email
     );

@@ -50,6 +50,21 @@ model Order {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
+  shippingFirstName    String?
+  shippingLastName     String?
+  shippingWhatsApp     String?
+  shippingStreet       String?
+  shippingNeighborhood String?
+  shippingPostalCode   String?
+  shippingCity         String?
+  shippingState        String?
+  shippingNotes        String?
+  shippingRecipient    String?
+  shippingPhone2       String?
+  hasValidIne          Boolean?
+  paymentMethod        String?
+  transferReceipt      String?  @db.Text
+
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   cart Cart? @relation(fields: [cartId], references: [id], onDelete: SetNull)
 }

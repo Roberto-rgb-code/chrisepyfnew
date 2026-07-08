@@ -12,15 +12,15 @@ import CheckoutSteps from '@/components/CheckoutSteps';
 import AuthModal from '@/components/AuthModal';
 import EmailVerificationNotice from '@/components/EmailVerificationNotice';
 import LoadingScreen from '@/components/LoadingScreen';
-import { Trash2, Plus, Minus, ShoppingBag, Shield, Truck, Lock } from '@/components/icons';
-import { redirectToCheckout } from '@/lib/stripe';
+import { Trash2, Plus, Minus, ShoppingBag, Shield, Truck, ArrowRight } from '@/components/icons';
+
+const PROMO_STORAGE_KEY = 'checkout_promo';
 
 function CartContent() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
   const { user, emailVerified } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [promoInput, setPromoInput] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<{
@@ -61,16 +61,16 @@ function CartContent() {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleContinue = () => {
     if (!user) {
       setShowAuthModal(true);
-      showToast('Inicia sesión para completar tu compra', 'info');
+      showToast('Inicia sesión para continuar', 'info');
       return;
     }
 
     if (!emailVerified) {
-      showToast('Verifica tu correo antes de pagar', 'error');
-      router.push('/verificar-correo?returnUrl=%2Fcarrito');
+      showToast('Verifica tu correo antes de continuar', 'error');
+      router.push('/verificar-correo?returnUrl=%2Fcheckout');
       return;
     }
 
@@ -79,37 +79,13 @@ function CartContent() {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const idToken = await user.getIdToken();
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          items: cart,
-          userId: user.uid,
-          userEmail: user.email,
-          customerName: user.displayName || user.email?.split('@')[0],
-          promoCode: appliedPromo?.code || null,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.url) {
-        await redirectToCheckout(data.url);
-      } else {
-        showToast(data.error || 'Error al procesar el pago', 'error');
-      }
-    } catch {
-      showToast('Error al conectar con el pago. Intenta de nuevo.', 'error');
-    } finally {
-      setLoading(false);
+    if (appliedPromo) {
+      sessionStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(appliedPromo));
+    } else {
+      sessionStorage.removeItem(PROMO_STORAGE_KEY);
     }
+
+    router.push('/checkout');
   };
 
   if (cart.length === 0) {
@@ -228,18 +204,16 @@ function CartContent() {
             </div>
 
             <button
-              onClick={handleCheckout}
-              disabled={loading || Boolean(user && !emailVerified)}
+              onClick={handleContinue}
+              disabled={Boolean(user && !emailVerified)}
               className="w-full bg-brand-red text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <Lock className="w-4 h-4" />
-              {loading
-                ? 'Redirigiendo a pago seguro...'
-                : user && !emailVerified
-                  ? 'Verifica tu correo para pagar'
-                  : user
-                    ? 'Pagar con Stripe'
-                    : 'Iniciar sesión y pagar'}
+              <ArrowRight className="w-4 h-4" />
+              {user && !emailVerified
+                ? 'Verifica tu correo para continuar'
+                : user
+                  ? 'Continuar a datos de entrega'
+                  : 'Iniciar sesión y continuar'}
             </button>
 
             {!user && (
@@ -272,7 +246,7 @@ function CartContent() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode="register"
-        onSuccess={handleCheckout}
+        onSuccess={() => router.push('/checkout')}
       />
     </div>
   );

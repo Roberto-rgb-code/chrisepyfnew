@@ -7,6 +7,11 @@ import { getEffectiveUnitPrice, normalizePromoCode } from '@/lib/pricing';
 import { buildStripeLineItems, calculateCheckoutSubtotal } from '@/lib/checkout-builder';
 import { isFirebaseAdminConfigured, verifyFirebaseIdToken } from '@/lib/firebase-admin';
 import { ADMIN_EMAIL } from '@/lib/constants';
+import {
+  shippingDetailsToMetadata,
+  shippingDetailsToOrderData,
+  validateShippingDetails,
+} from '@/lib/shipping';
 
 validateStripeKeys();
 
@@ -16,11 +21,30 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, userId, userEmail, customerName, promoCode } = await request.json();
+    const { items, userId, userEmail, promoCode, shippingDetails } = await request.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No items provided' }, { status: 400 });
     }
+
+    if (!shippingDetails) {
+      return NextResponse.json({ error: 'Debes completar los datos de entrega' }, { status: 400 });
+    }
+
+    const shippingValidation = validateShippingDetails({
+      ...shippingDetails,
+      email: userEmail,
+    });
+
+    if (!shippingValidation.valid || !shippingValidation.data) {
+      return NextResponse.json(
+        { error: 'Datos de entrega inválidos', details: shippingValidation.errors },
+        { status: 400 }
+      );
+    }
+
+    const shipping = shippingValidation.data;
+    const shippingOrderData = shippingDetailsToOrderData(shipping);
 
     if (userId && isFirebaseAdminConfigured()) {
       const idToken = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
@@ -113,16 +137,17 @@ export async function POST(request: NextRequest) {
       line_items: lineItems,
       mode: 'payment',
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/carrito`,
+      cancel_url: `${baseUrl}/checkout`,
       customer_email: userEmail,
       metadata: {
         userId: userId || '',
         cartId: cartId || '',
         itemCount: items.length.toString(),
-        customerName: customerName || userEmail?.split('@')[0] || '',
+        customerName: shippingOrderData.customerName,
         promoCodeId: appliedPromoId || '',
         unitPriceMxn: unitPrice.toString(),
         subtotalMxn: subtotal.toString(),
+        ...shippingDetailsToMetadata(shipping),
       },
     };
 

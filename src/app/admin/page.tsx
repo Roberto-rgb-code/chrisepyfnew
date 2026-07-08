@@ -53,6 +53,20 @@ interface Order {
   totalItems: number;
   createdAt: any;
   orderDate: string;
+  shippingFirstName?: string | null;
+  shippingLastName?: string | null;
+  shippingWhatsApp?: string | null;
+  shippingStreet?: string | null;
+  shippingNeighborhood?: string | null;
+  shippingPostalCode?: string | null;
+  shippingCity?: string | null;
+  shippingState?: string | null;
+  shippingNotes?: string | null;
+  shippingRecipient?: string | null;
+  shippingPhone2?: string | null;
+  hasValidIne?: boolean | null;
+  paymentMethod?: string | null;
+  transferReceipt?: string | null;
 }
 
 interface Stats {
@@ -203,9 +217,9 @@ export default function AdminPage() {
 
       if (!response.ok) throw new Error('Failed to update order');
       
-      // Actualizar estado local
+      const { order: updated } = await response.json();
       setOrders(orders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
+        order.id === orderId ? { ...order, ...updated } : order
       ));
       
       alert(`Estado actualizado a: ${getStatusLabel(newStatus)}`);
@@ -215,9 +229,32 @@ export default function AdminPage() {
     }
   };
 
+  const confirmTransferPayment = async (orderId: string) => {
+    if (!user) return;
+    if (!confirm('¿Confirmar que la transferencia fue recibida correctamente?')) return;
+
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.uid, confirmPayment: true }),
+      });
+
+      if (!response.ok) throw new Error('Failed to confirm payment');
+
+      const { order: updated } = await response.json();
+      setOrders(orders.map((order) => (order.id === orderId ? { ...order, ...updated } : order)));
+      alert('Pago confirmado. Se envió correo al cliente.');
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      alert('Error al confirmar el pago');
+    }
+  };
+
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
       'confirmed': 'Confirmado',
+      'pending_payment': 'Pago pendiente',
       'processing': 'En Proceso',
       'shipped': 'Enviado',
       'delivered': 'Entregado',
@@ -229,6 +266,7 @@ export default function AdminPage() {
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       'confirmed': 'bg-blue-100 text-blue-800',
+      'pending_payment': 'bg-orange-100 text-orange-800',
       'processing': 'bg-yellow-100 text-yellow-800',
       'shipped': 'bg-purple-100 text-purple-800',
       'delivered': 'bg-green-100 text-green-800',
@@ -240,6 +278,7 @@ export default function AdminPage() {
   const getStatusIcon = (status: string) => {
     const icons: Record<string, any> = {
       'confirmed': CheckCircle,
+      'pending_payment': Clock,
       'processing': Clock,
       'shipped': Truck,
       'delivered': Package,
@@ -453,6 +492,7 @@ export default function AdminPage() {
                   className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                 >
                   <option value="all">Todos los estados</option>
+                  <option value="pending_payment">Pago pendiente</option>
                   <option value="confirmed">Confirmados</option>
                   <option value="processing">En Proceso</option>
                   <option value="shipped">Enviados</option>
@@ -541,6 +581,9 @@ export default function AdminPage() {
                           <td className="px-6 py-4">
                             <p className="font-medium text-gray-900">{order.customerName || 'N/A'}</p>
                             <p className="text-sm text-gray-500">{order.customerEmail}</p>
+                            {order.paymentMethod === 'bank_transfer' && (
+                              <p className="text-xs text-orange-600 font-medium mt-1">Transferencia bancaria</p>
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -567,6 +610,7 @@ export default function AdminPage() {
                               onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                               className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-red"
                             >
+                              <option value="pending_payment">Pago pendiente</option>
                               <option value="confirmed">Confirmado</option>
                               <option value="processing">En Proceso</option>
                               <option value="shipped">Enviado</option>
@@ -775,6 +819,60 @@ export default function AdminPage() {
                                   ))}
                                 </div>
                                 
+                                {/* Comprobante de transferencia */}
+                                {order.paymentMethod === 'bank_transfer' && order.transferReceipt && (
+                                  <div className="bg-white rounded-xl p-4 border border-orange-200 mb-4">
+                                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                      <p className="text-sm font-semibold text-gray-700">🧾 Comprobante de transferencia</p>
+                                      {order.status === 'pending_payment' && (
+                                        <button
+                                          type="button"
+                                          onClick={() => confirmTransferPayment(order.id)}
+                                          className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700"
+                                        >
+                                          Confirmar pago recibido
+                                        </button>
+                                      )}
+                                    </div>
+                                    {order.transferReceipt.startsWith('data:application/pdf') ? (
+                                      <a
+                                        href={order.transferReceipt}
+                                        download={`comprobante-${order.orderId}.pdf`}
+                                        className="text-sm text-brand-red font-medium hover:underline"
+                                      >
+                                        Descargar comprobante PDF
+                                      </a>
+                                    ) : (
+                                      <a href={order.transferReceipt} target="_blank" rel="noopener noreferrer">
+                                        <img
+                                          src={order.transferReceipt}
+                                          alt="Comprobante de transferencia"
+                                          className="max-h-64 rounded-lg border border-gray-200"
+                                        />
+                                      </a>
+                                    )}
+                                    <p className="text-xs text-gray-500 mt-2">
+                                      Estado de pago: {order.paymentStatus || 'N/A'}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Datos de entrega */}
+                                {(order.shippingStreet || order.shippingWhatsApp) && (
+                                  <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4">
+                                    <p className="text-sm font-semibold text-gray-700 mb-3">📦 Datos de entrega</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                      <div><span className="text-gray-500">Comprador:</span> <span className="text-gray-900">{order.shippingFirstName} {order.shippingLastName}</span></div>
+                                      <div><span className="text-gray-500">WhatsApp:</span> <span className="text-gray-900">{order.shippingWhatsApp}</span></div>
+                                      <div><span className="text-gray-500">Entregar a:</span> <span className="text-gray-900">{order.shippingRecipient}</span></div>
+                                      {order.shippingPhone2 && <div><span className="text-gray-500">Tel. 2:</span> <span className="text-gray-900">{order.shippingPhone2}</span></div>}
+                                      <div className="md:col-span-2"><span className="text-gray-500">Domicilio:</span> <span className="text-gray-900">{order.shippingStreet}, Col. {order.shippingNeighborhood}, CP {order.shippingPostalCode}, {order.shippingCity}, {order.shippingState}</span></div>
+                                      {order.shippingNotes && <div className="md:col-span-2"><span className="text-gray-500">Referencias:</span> <span className="text-gray-900">{order.shippingNotes}</span></div>}
+                                      <div><span className="text-gray-500">INE vigente:</span> <span className="text-gray-900">{order.hasValidIne ? 'Sí' : 'No'}</span></div>
+                                    </div>
+                                  </div>
+                                )}
+
                                 {/* Info adicional */}
                                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                                   <p className="text-sm font-semibold text-gray-700 mb-3">📋 Información técnica</p>
