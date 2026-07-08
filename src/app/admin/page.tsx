@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
 import AdminPricingPanel from '@/components/admin/AdminPricingPanel';
+import AdminAnnouncementsPanel from '@/components/admin/AdminAnnouncementsPanel';
 import { 
   ShoppingBag, 
   DollarSign, 
@@ -33,7 +34,8 @@ import {
   Move,
   Activity,
   UserCircle,
-  ShoppingCart
+  ShoppingCart,
+  Bell
 } from '@/components/icons';
 
 interface Order {
@@ -85,7 +87,7 @@ interface ActivityItem {
   metadata: Record<string, unknown>;
 }
 
-type AdminTab = 'orders' | 'activity' | 'clients' | 'pricing';
+type AdminTab = 'orders' | 'activity' | 'clients' | 'pricing' | 'announcements';
 
 export default function AdminPage() {
   const { user, loading, isAdmin } = useAuth();
@@ -335,6 +337,7 @@ export default function AdminPage() {
               { id: 'activity' as const, label: 'Movimientos', icon: Activity },
               { id: 'clients' as const, label: 'Clientes', icon: Users },
               { id: 'pricing' as const, label: 'Precios', icon: DollarSign },
+              { id: 'announcements' as const, label: 'Anuncios', icon: Bell },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -352,7 +355,7 @@ export default function AdminPage() {
           </div>
 
           {/* Stats Cards */}
-          {activeTab !== 'pricing' && (
+          {activeTab !== 'pricing' && activeTab !== 'announcements' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <div className="flex items-center justify-between">
@@ -924,12 +927,15 @@ export default function AdminPage() {
 
           {activeTab === 'pricing' && <AdminPricingPanel />}
 
+          {activeTab === 'announcements' && <AdminAnnouncementsPanel />}
+
           {/* Footer info */}
           <div className="mt-6 text-center text-sm text-gray-500">
             {activeTab === 'orders' && `Mostrando ${filteredOrders.length} de ${orders.length} órdenes`}
             {activeTab === 'activity' && `Mostrando ${filteredActivities.length} de ${activities.length} movimientos`}
             {activeTab === 'clients' && `${clients.length} clientes registrados`}
             {activeTab === 'pricing' && 'Configura precios, promociones y códigos con Stripe'}
+            {activeTab === 'announcements' && 'Edita los mensajes de la barra superior del sitio'}
           </div>
         </div>
       </div>

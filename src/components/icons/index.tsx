@@ -15,8 +15,8 @@ function icon(id: string): ComponentType<IconProps> {
 
 export const Smartphone = icon('line-md:cellphone-twotone');
 export const Search = icon('line-md:search-twotone');
-export const ShoppingCart = icon('line-md:briefcase-plus-twotone');
-export const ShoppingBag = icon('line-md:briefcase-twotone');
+export const ShoppingCart = icon('mdi:shopping-cart');
+export const ShoppingBag = icon('mdi:shopping-outline');
 export const User = icon('line-md:account');
 export const Menu = icon('line-md:menu');
 export const Shield = icon('line-md:security-filled');
@@ -65,4 +65,5 @@ export const FlipHorizontal = icon('line-md:arrows-horizontal-alt');
 export const FlipVertical = icon('line-md:arrows-vertical-alt');
 export const Move = icon('line-md:my-location-loop');
 export const Activity = icon('line-md:speedometer-loop');
+export const Bell = icon('line-md:bell-twotone');
 export const UserCircle = icon('line-md:account-small');
