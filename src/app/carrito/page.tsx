@@ -10,13 +10,14 @@ import Footer from '@/components/Footer';
 import CasePreview from '@/components/CasePreview';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import AuthModal from '@/components/AuthModal';
+import EmailVerificationNotice from '@/components/EmailVerificationNotice';
 import LoadingScreen from '@/components/LoadingScreen';
 import { Trash2, Plus, Minus, ShoppingBag, Shield, Truck, Lock } from '@/components/icons';
 import { redirectToCheckout } from '@/lib/stripe';
 
 function CartContent() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, emailVerified } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,12 @@ function CartContent() {
       return;
     }
 
+    if (!emailVerified) {
+      showToast('Verifica tu correo antes de pagar', 'error');
+      router.push('/verificar-correo?returnUrl=%2Fcarrito');
+      return;
+    }
+
     if (cart.length === 0) {
       showToast('Tu carrito está vacío', 'error');
       return;
@@ -75,9 +82,13 @@ function CartContent() {
     setLoading(true);
 
     try {
+      const idToken = await user.getIdToken();
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           items: cart,
           userId: user.uid,
@@ -163,6 +174,12 @@ function CartContent() {
           <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 lg:sticky lg:top-24">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Resumen</h2>
 
+            {user && !emailVerified && (
+              <div className="mb-4">
+                <EmailVerificationNotice />
+              </div>
+            )}
+
             <div className="mb-4">
               <label className="block text-sm font-semibold text-gray-700 mb-2">Código promocional</label>
               <div className="flex gap-2">
@@ -212,11 +229,17 @@ function CartContent() {
 
             <button
               onClick={handleCheckout}
-              disabled={loading}
+              disabled={loading || Boolean(user && !emailVerified)}
               className="w-full bg-brand-red text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Lock className="w-4 h-4" />
-              {loading ? 'Redirigiendo a pago seguro...' : user ? 'Pagar con Stripe' : 'Iniciar sesión y pagar'}
+              {loading
+                ? 'Redirigiendo a pago seguro...'
+                : user && !emailVerified
+                  ? 'Verifica tu correo para pagar'
+                  : user
+                    ? 'Pagar con Stripe'
+                    : 'Iniciar sesión y pagar'}
             </button>
 
             {!user && (

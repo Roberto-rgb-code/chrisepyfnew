@@ -9,12 +9,13 @@ import { ShoppingCart, User, Menu, Shield, X } from '@/components/icons';
 import { useState } from 'react';
 import AuthModal from './AuthModal';
 import AnnouncementBar from './AnnouncementBar';
+import EmailVerificationNotice from './EmailVerificationNotice';
 import ModelSearchBox from './ModelSearchBox';
 import { BRAND_LOGO, BRAND_NAME, BRAND_TAGLINE } from '@/lib/brand';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, emailVerified } = useAuth();
   const { getCartCount } = useCart();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -32,6 +33,7 @@ export default function Navbar() {
   return (
     <>
       <AnnouncementBar />
+      {user && !emailVerified && <EmailVerificationNotice variant="banner" showResend={false} />}
       <header className="navbar">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3 sm:gap-4 h-16">

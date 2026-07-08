@@ -5,6 +5,8 @@ import { validateStripeKeys } from '@/lib/stripe-config';
 import { getStoreSettings } from '@/lib/store-settings';
 import { getEffectiveUnitPrice, normalizePromoCode } from '@/lib/pricing';
 import { buildStripeLineItems, calculateCheckoutSubtotal } from '@/lib/checkout-builder';
+import { isFirebaseAdminConfigured, verifyFirebaseIdToken } from '@/lib/firebase-admin';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 validateStripeKeys();
 
@@ -18,6 +20,26 @@ export async function POST(request: NextRequest) {
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No items provided' }, { status: 400 });
+    }
+
+    if (userId && isFirebaseAdminConfigured()) {
+      const idToken = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+      if (!idToken) {
+        return NextResponse.json({ error: 'Sesión no válida' }, { status: 401 });
+      }
+
+      const decoded = await verifyFirebaseIdToken(idToken);
+      if (!decoded || decoded.uid !== userId) {
+        return NextResponse.json({ error: 'Sesión no válida' }, { status: 401 });
+      }
+
+      const email = decoded.email?.toLowerCase();
+      if (email !== ADMIN_EMAIL.toLowerCase() && !decoded.email_verified) {
+        return NextResponse.json(
+          { error: 'Debes verificar tu correo electrónico antes de pagar' },
+          { status: 403 }
+        );
+      }
     }
 
     const settings = await getStoreSettings();

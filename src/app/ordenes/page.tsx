@@ -34,24 +34,28 @@ interface Order {
 }
 
 export default function OrdersPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, emailVerified } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!loading && !user) router.push('/login?returnUrl=/ordenes');
-  }, [user, loading, router]);
+    if (!loading && !user) {
+      router.push('/login?returnUrl=%2Fordenes');
+    } else if (!loading && user && !emailVerified) {
+      router.push('/verificar-correo?returnUrl=%2Fordenes');
+    }
+  }, [user, loading, emailVerified, router]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !emailVerified) return;
     fetch(`/api/orders?userId=${user.uid}`)
       .then((r) => r.json())
       .then((data) => setOrders(data.orders || []))
       .catch(console.error)
       .finally(() => setLoadingOrders(false));
-  }, [user]);
+  }, [user, emailVerified]);
 
   const statusColors: Record<string, string> = {
     confirmed: 'bg-blue-100 text-blue-800',

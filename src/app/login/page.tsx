@@ -30,9 +30,11 @@ function LoginForm() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      const { emailVerified: verified } = await login(email, password);
       if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
         router.push('/admin');
+      } else if (!verified && returnUrl !== '/verificar-correo') {
+        router.push(`/verificar-correo?returnUrl=${encodeURIComponent(returnUrl)}`);
       } else {
         router.push(returnUrl);
       }

@@ -33,7 +33,7 @@ function RegisterForm() {
     setLoading(true);
     try {
       await signup(email, password, name);
-      router.push(returnUrl);
+      router.push(`/verificar-correo?returnUrl=${encodeURIComponent(returnUrl)}`);
     } catch (err: any) {
       setError(err.code === 'auth/email-already-in-use' ? 'Este correo ya está registrado' : 'Error al crear la cuenta');
     } finally {

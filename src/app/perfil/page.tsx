@@ -6,10 +6,11 @@ import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
-import { User, Mail, Calendar } from '@/components/icons';
+import EmailVerificationNotice from '@/components/EmailVerificationNotice';
+import { User, Mail, Calendar, CheckCircle } from '@/components/icons';
 
 export default function ProfilePage() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, emailVerified } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -43,6 +44,12 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Mi Perfil</h1>
 
+        {!emailVerified && (
+          <div className="mb-6">
+            <EmailVerificationNotice />
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex items-center space-x-6 mb-8">
             <div className="w-24 h-24 bg-brand-red rounded-full flex items-center justify-center">
@@ -70,6 +77,15 @@ export default function ProfilePage() {
               <div>
                 <p className="text-sm text-gray-600">Correo electrónico</p>
                 <p className="font-semibold">{user.email}</p>
+                <p className={`text-xs mt-1 flex items-center gap-1 ${emailVerified ? 'text-green-600' : 'text-amber-600'}`}>
+                  {emailVerified ? (
+                    <>
+                      <CheckCircle className="w-3.5 h-3.5" /> Verificado
+                    </>
+                  ) : (
+                    'Pendiente de verificación'
+                  )}
+                </p>
               </div>
             </div>
 

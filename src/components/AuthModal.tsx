@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth as firebaseAuth } from '@/lib/firebase';
@@ -23,9 +24,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [verificationPending, setVerificationPending] = useState(false);
 
   const auth = useAuth();
   const { login, signup } = auth || {};
+  const router = useRouter();
 
   useEffect(() => {
     setMode(initialMode);
@@ -34,6 +37,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setVerificationPending(false);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -65,15 +69,28 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           return;
         }
         await signup(email, password, name);
+        setVerificationPending(true);
+        setName('');
+        setPassword('');
+        setConfirmPassword('');
+        setLoading(false);
+        return;
       } else {
         if (!login) {
           setError('Error de autenticación. Intenta recargar la página.');
           setLoading(false);
           return;
         }
-        await login(email, password);
+        const { emailVerified: verified } = await login(email, password);
+        onClose();
+        setEmail('');
+        setPassword('');
+        if (!verified) {
+          router.push('/verificar-correo?returnUrl=%2Fcarrito');
+          setLoading(false);
+          return;
+        }
       }
-      onClose();
       setName('');
       setEmail('');
       setPassword('');
@@ -130,12 +147,45 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
-          {mode === 'login' ? 'Bienvenido de vuelta' : 'Crea tu cuenta'}
+          {verificationPending
+            ? 'Revisa tu correo'
+            : mode === 'login'
+              ? 'Bienvenido de vuelta'
+              : 'Crea tu cuenta'}
         </h1>
         <p className="text-gray-600 text-center mb-6">
-          {mode === 'login' ? 'Inicia sesión para continuar' : 'Únete y personaliza tus fundas'}
+          {verificationPending
+            ? `Enviamos un enlace de verificación a ${email}`
+            : mode === 'login'
+              ? 'Inicia sesión para continuar'
+              : 'Únete y personaliza tus fundas'}
         </p>
 
+        {verificationPending ? (
+          <div className="space-y-4">
+            <div className="bg-brand-red-light border border-red-200 text-gray-700 px-4 py-4 rounded-lg text-sm leading-relaxed">
+              Confirma tu correo para poder pagar. Revisa también la carpeta de spam.
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                router.push('/verificar-correo?returnUrl=%2Fcarrito');
+              }}
+              className="w-full bg-brand-red text-white py-3 rounded-lg font-semibold hover:bg-brand-red-dark transition-all"
+            >
+              Ir a verificación
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
+            >
+              Cerrar
+            </button>
+          </div>
+        ) : (
+          <>
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
             {error}
@@ -258,6 +308,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             </button>
           </p>
         </div>
+          </>
+        )}
       </div>
     </div>
   );
