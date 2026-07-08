@@ -14,6 +14,7 @@ import { phoneData, PhoneModel } from '@/data/phoneData';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
+import { usePricing } from '@/contexts/PricingContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { uploadDesignImage } from '@/lib/uploadImage';
 
@@ -40,6 +41,7 @@ function HomeContent() {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { effectivePriceMxn } = usePricing();
   const router = useRouter();
 
   useEffect(() => {
@@ -96,7 +98,7 @@ function HomeContent() {
       colorURL: selectedModel.colorURL,
       maskURL: selectedModel.maskURL,
       customImage: userImageSrc,
-      price: 599,
+      price: effectivePriceMxn,
       quantity: 1,
       imageControls: { ...imageControls },
     };

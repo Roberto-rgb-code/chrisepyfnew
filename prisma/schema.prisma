@@ -67,3 +67,29 @@ model Personalization {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model StoreSettings {
+  id                  String   @id @default("default")
+  basePriceMxn        Float    @default(599)
+  promoActive         Boolean  @default(false)
+  promoTitle          String?
+  promoDiscountType   String?
+  promoDiscountValue  Float?
+  updatedAt           DateTime @updatedAt
+  createdAt           DateTime @default(now())
+}
+
+model PromoCode {
+  id                    String    @id @default(cuid())
+  code                  String    @unique
+  discountType          String
+  discountValue         Float
+  active                Boolean   @default(true)
+  expiresAt             DateTime?
+  maxUses               Int?
+  usedCount             Int       @default(0)
+  stripeCouponId        String?
+  stripePromotionCodeId String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { PhoneModel } from '@/data/phoneData';
 import { Crosshair } from '@/components/icons';
+import PriceDisplay from '@/components/PriceDisplay';
 import Image from 'next/image';
 
 export interface ImageControls {
@@ -336,10 +337,7 @@ export default function CaseCustomizer({
 
       {/* Sidebar Derecho */}
       <div className="sidebar-right fade-in" data-tour="controls">
-        <div className="price-section">
-          <div className="price-amount">$599 MXN</div>
-          <div className="price-subtitle">Envío gratis incluido</div>
-        </div>
+        <PriceDisplay />
 
         <button onClick={handleAddToCartClick} className="primary-button add-to-cart-button" data-tour="add-cart">
           🛒 Agregar al Carrito

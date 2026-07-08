@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
+import AdminPricingPanel from '@/components/admin/AdminPricingPanel';
 import { 
   ShoppingBag, 
   DollarSign, 
@@ -84,7 +85,7 @@ interface ActivityItem {
   metadata: Record<string, unknown>;
 }
 
-type AdminTab = 'orders' | 'activity' | 'clients';
+type AdminTab = 'orders' | 'activity' | 'clients' | 'pricing';
 
 export default function AdminPage() {
   const { user, loading, isAdmin } = useAuth();
@@ -333,6 +334,7 @@ export default function AdminPage() {
               { id: 'orders' as const, label: 'Compras', icon: ShoppingBag },
               { id: 'activity' as const, label: 'Movimientos', icon: Activity },
               { id: 'clients' as const, label: 'Clientes', icon: Users },
+              { id: 'pricing' as const, label: 'Precios', icon: DollarSign },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -350,6 +352,7 @@ export default function AdminPage() {
           </div>
 
           {/* Stats Cards */}
+          {activeTab !== 'pricing' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <div className="flex items-center justify-between">
@@ -423,6 +426,7 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Filters - Orders tab */}
           {activeTab === 'orders' && (
@@ -918,11 +922,14 @@ export default function AdminPage() {
             </div>
           )}
 
+          {activeTab === 'pricing' && <AdminPricingPanel />}
+
           {/* Footer info */}
           <div className="mt-6 text-center text-sm text-gray-500">
             {activeTab === 'orders' && `Mostrando ${filteredOrders.length} de ${orders.length} órdenes`}
             {activeTab === 'activity' && `Mostrando ${filteredActivities.length} de ${activities.length} movimientos`}
             {activeTab === 'clients' && `${clients.length} clientes registrados`}
+            {activeTab === 'pricing' && 'Configura precios, promociones y códigos con Stripe'}
           </div>
         </div>
       </div>

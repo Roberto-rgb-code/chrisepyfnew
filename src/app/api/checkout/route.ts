@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { validateStripeKeys } from '@/lib/stripe-config';
+import { getStoreSettings } from '@/lib/store-settings';
+import { getEffectiveUnitPrice, normalizePromoCode } from '@/lib/pricing';
+import { buildStripeLineItems, calculateCheckoutSubtotal } from '@/lib/checkout-builder';
 
 validateStripeKeys();
 
@@ -11,34 +14,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, userId, userEmail, customerName } = await request.json();
+    const { items, userId, userEmail, customerName, promoCode } = await request.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No items provided' }, { status: 400 });
     }
 
-    const lineItems = items.map((item: any) => {
-      const productImage = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}${item.colorURL}`;
+    const settings = await getStoreSettings();
+    const unitPrice = getEffectiveUnitPrice(settings);
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
 
-      return {
-        price_data: {
-          currency: 'mxn',
-          product_data: {
-            name: `Funda Personalizada - ${item.modelName}`,
-            description: item.customImage ? 'Con diseño personalizado' : 'Funda sin personalizar',
-            images: [productImage],
-            metadata: {
-              productId: item.id,
-              modelName: item.modelName,
-            },
-          },
-          unit_amount: Math.round(item.price * 100),
-        },
-        quantity: item.quantity,
-      };
-    });
+    const lineItems = buildStripeLineItems(items, settings, baseUrl);
 
     let cartId: string | null = null;
+    let appliedPromoId: string | null = null;
+    let stripePromotionCodeId: string | null = null;
 
     try {
       const cartItems = items.map((item: any) => ({
@@ -46,7 +36,7 @@ export async function POST(request: NextRequest) {
         modelName: item.modelName,
         modelId: item.modelId || item.id.split('-')[0],
         quantity: item.quantity,
-        price: item.price,
+        price: unitPrice,
         colorURL: item.colorURL || '',
         maskURL: item.maskURL || '',
         customImage: item.customImage || null,
@@ -63,29 +53,75 @@ export async function POST(request: NextRequest) {
       });
 
       cartId = cart.id;
-      console.log('✅ Carrito guardado en PostgreSQL:', cartId);
     } catch (error) {
-      console.error('❌ Error guardando carrito:', error);
+      console.error('Error guardando carrito:', error);
     }
 
-    const session = await stripe.checkout.sessions.create({
+    if (promoCode) {
+      const normalized = normalizePromoCode(promoCode);
+      const promo = await prisma.promoCode.findUnique({ where: { code: normalized } });
+
+      if (!promo || !promo.active) {
+        return NextResponse.json({ error: 'Código promocional no válido' }, { status: 400 });
+      }
+
+      if (promo.expiresAt && promo.expiresAt < new Date()) {
+        return NextResponse.json({ error: 'Este código expiró' }, { status: 400 });
+      }
+
+      if (promo.maxUses != null && promo.usedCount >= promo.maxUses) {
+        return NextResponse.json({ error: 'Este código ya no tiene usos disponibles' }, { status: 400 });
+      }
+
+      if (!promo.stripePromotionCodeId) {
+        return NextResponse.json(
+          { error: 'Código no sincronizado con Stripe. Contacta al administrador.' },
+          { status: 400 }
+        );
+      }
+
+      appliedPromoId = promo.id;
+      stripePromotionCodeId = promo.stripePromotionCodeId;
+    }
+
+    const subtotal = calculateCheckoutSubtotal(items, settings);
+
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/carrito`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/carrito`,
       customer_email: userEmail,
       metadata: {
         userId: userId || '',
         cartId: cartId || '',
         itemCount: items.length.toString(),
         customerName: customerName || userEmail?.split('@')[0] || '',
+        promoCodeId: appliedPromoId || '',
+        unitPriceMxn: unitPrice.toString(),
+        subtotalMxn: subtotal.toString(),
       },
-    });
+    };
+
+    if (stripePromotionCodeId) {
+      sessionParams.discounts = [{ promotion_code: stripePromotionCodeId }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
+
+    if (appliedPromoId) {
+      await prisma.promoCode.update({
+        where: { id: appliedPromoId },
+        data: { usedCount: { increment: 1 } },
+      });
+    }
 
     return NextResponse.json({
       url: session.url,
       sessionId: session.id,
+      unitPriceMxn: unitPrice,
+      subtotalMxn: subtotal,
     });
   } catch (error: any) {
     console.error('Stripe error:', error);

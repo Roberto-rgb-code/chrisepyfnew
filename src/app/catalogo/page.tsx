@@ -11,6 +11,7 @@ import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
 import ModelSearchBox from '@/components/ModelSearchBox';
 import { Search, Filter, Grid, List } from '@/components/icons';
+import { usePricing } from '@/contexts/PricingContext';
 
 function CatalogoContent() {
   const searchParams = useSearchParams();
@@ -190,6 +191,19 @@ export default function CatalogoPage() {
   );
 }
 
+function CatalogPrice() {
+  const { formattedEffective, formattedBase, promo, basePriceMxn, effectivePriceMxn } = usePricing();
+  const onSale = promo.active && effectivePriceMxn < basePriceMxn;
+  return onSale ? (
+    <div>
+      <span className="text-sm text-gray-400 line-through mr-2">{formattedBase}</span>
+      <span className="text-xl sm:text-2xl font-bold text-blue-600">{formattedEffective}</span>
+    </div>
+  ) : (
+    <span className="text-xl sm:text-2xl font-bold text-blue-600">{formattedEffective}</span>
+  );
+}
+
 function ModelCard({ model }: { model: PhoneModel }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
@@ -214,9 +228,7 @@ function ModelCard({ model }: { model: PhoneModel }) {
         </p>
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-blue-600">
-            $599 MXN
-          </span>
+          <CatalogPrice />
           <Link
             href={`/?model=${model.id}`}
             className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm"
@@ -259,9 +271,7 @@ function ModelListItem({ model }: { model: PhoneModel }) {
             </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
-              <span className="text-xl sm:text-2xl font-bold text-blue-600">
-                $599 MXN
-              </span>
+              <CatalogPrice />
               <Link
                 href={`/?model=${model.id}`}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 sm:px-6 py-2.5 sm:py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium text-sm sm:text-base whitespace-nowrap"

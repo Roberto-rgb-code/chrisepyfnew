@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
+import { PricingProvider } from '@/contexts/PricingContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
 import ProductTour from '@/components/ProductTour';
@@ -30,13 +31,15 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${inter.className} pb-20 sm:pb-0`} style={{ backgroundColor: '#f8fafc', margin: 0, padding: 0 }}>
         <AuthProvider>
-          <CartProvider>
-            <ToastProvider>
-              {children}
-              <WhatsAppWidget />
-              <ProductTour />
-            </ToastProvider>
-          </CartProvider>
+          <PricingProvider>
+            <CartProvider>
+              <ToastProvider>
+                {children}
+                <WhatsAppWidget />
+                <ProductTour />
+              </ToastProvider>
+            </CartProvider>
+          </PricingProvider>
         </AuthProvider>
       </body>
     </html>
