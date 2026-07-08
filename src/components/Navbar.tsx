@@ -34,32 +34,36 @@ export default function Navbar() {
       <AnnouncementBar />
       <header className="navbar">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center shrink-0 min-w-0">
-              <Image
-                src={BRAND_LOGO}
-                alt={`${BRAND_NAME} - ${BRAND_TAGLINE}`}
-                width={180}
-                height={52}
-                className="h-10 sm:h-11 w-auto object-contain"
-                priority
-              />
-            </Link>
+          <div className="flex items-center justify-between gap-3 sm:gap-4 h-16">
+            {/* Logo + navegación */}
+            <div className="flex items-center min-w-0 gap-4 sm:gap-6 lg:gap-10">
+              <Link href="/" className="flex-shrink-0 block">
+                <Image
+                  src={BRAND_LOGO}
+                  alt={`${BRAND_NAME} - ${BRAND_TAGLINE}`}
+                  width={160}
+                  height={48}
+                  className="h-8 sm:h-9 md:h-10 w-auto max-w-[120px] sm:max-w-[140px] md:max-w-[160px] object-contain object-left"
+                  priority
+                />
+              </Link>
 
-            <div className="hidden md:flex items-center space-x-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`nav-link px-4 py-2 rounded-lg transition-colors ${isActive(link.href) ? 'active bg-brand-red-light text-brand-red' : ''}`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <div className="hidden md:flex items-center gap-0.5 lg:gap-1">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`nav-link px-3 lg:px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${isActive(link.href) ? 'active bg-brand-red-light text-brand-red font-semibold' : ''}`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-4 flex-1 justify-end min-w-0">
-              <div className="min-w-0 hidden sm:block sm:flex-1 sm:max-w-xs md:max-w-sm lg:max-w-md">
+            {/* Búsqueda y acciones */}
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+              <div className="hidden sm:block w-36 md:w-44 lg:w-56 xl:w-64">
                 <ModelSearchBox variant="navbar" />
               </div>
 

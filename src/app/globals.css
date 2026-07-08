@@ -436,14 +436,7 @@ body {
 }
 
 .nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--brand-red);
-  border-radius: 1px;
+  display: none;
 }
 
 .cart-badge {
