@@ -1,8 +1,17 @@
 import { EmailReadyItem } from './email-utils';
 import { formatShippingAddress, type ShippingDetails } from './shipping';
 import { BANK_TRANSFER_DETAILS, formatClabe } from './bank-transfer';
+import { SOCIAL_LINKS } from './constants';
 
 const brandGradient = 'linear-gradient(135deg, #df2f36 0%, #991b1b 100%)';
+
+const emailSocialLinks = `
+  <p style="margin:16px 0 0;color:#6b7280;font-size:13px;">
+    Síguenos:
+    <a href="${SOCIAL_LINKS.facebook}" style="color:#df2f36;text-decoration:none;margin:0 8px;">Facebook</a>
+    ·
+    <a href="${SOCIAL_LINKS.instagram}" style="color:#df2f36;text-decoration:none;margin:0 8px;">Instagram</a>
+  </p>`;
 
 function renderProducts(items: EmailReadyItem[]) {
   return items
@@ -48,6 +57,7 @@ function emailShell(title: string, subtitle: string, body: string) {
   <div style="background:#f1f5f9;padding:20px;text-align:center;border-radius:0 0 16px 16px;border:1px solid #e5e7eb;border-top:none;">
     <p style="margin:0;color:#6b7280;font-size:13px;">© 2025 Empaques & Fundas · empaquesyfundas.com</p>
     <p style="margin:8px 0 0;color:#6b7280;font-size:13px;">📧 soporte@empaquesyfundas.com · 📱 +52 33 1149 3852</p>
+    ${emailSocialLinks}
   </div>
 </body>
 </html>`;

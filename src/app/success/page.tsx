@@ -7,8 +7,10 @@ import { useCart } from '@/contexts/CartContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CheckoutSteps from '@/components/CheckoutSteps';
-import { Mail, Package, ArrowRight, Sparkles, Clock } from '@/components/icons';
+import { Mail, Package, ArrowRight, Sparkles, Clock, Download } from '@/components/icons';
 import { formatOrderNumber } from '@/lib/email-utils';
+import { downloadDataUrl } from '@/lib/download-image';
+import { SOCIAL_LINKS } from '@/lib/constants';
 import PhoneLoader from '@/components/PhoneLoader';
 import LoadingScreen from '@/components/LoadingScreen';
 
@@ -16,6 +18,13 @@ const SuccessAnimation = dynamic(() => import('@/components/SuccessAnimation'), 
   ssr: false,
   loading: () => <PhoneLoader size="md" className="mx-auto" />,
 });
+
+const DESIGNS_STORAGE_KEY = 'last_order_designs';
+
+interface SavedDesign {
+  modelName: string;
+  customImage: string;
+}
 
 function SuccessContent() {
   const router = useRouter();
@@ -25,10 +34,23 @@ function SuccessContent() {
   const transferOrder = searchParams.get('order');
   const isTransfer = searchParams.get('transfer') === '1';
   const [showContent, setShowContent] = useState(false);
+  const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
 
   useEffect(() => {
     if (sessionId) clearCart();
   }, [sessionId, clearCart]);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DESIGNS_STORAGE_KEY);
+      if (raw) {
+        setSavedDesigns(JSON.parse(raw));
+        sessionStorage.removeItem(DESIGNS_STORAGE_KEY);
+      }
+    } catch {
+      setSavedDesigns([]);
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 300);
@@ -131,6 +153,46 @@ function SuccessContent() {
                 ))}
               </div>
 
+              {savedDesigns.length > 0 && (
+                <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-8 text-left">
+                  <h2 className="text-lg font-bold text-gray-900 mb-3">🎨 Tu diseño personalizado</h2>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Guarda una copia de tu imagen antes de cerrar esta página.
+                  </p>
+                  <div className="space-y-4">
+                    {savedDesigns.map((design, index) => (
+                      <div
+                        key={`${design.modelName}-${index}`}
+                        className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 rounded-xl p-4 border border-gray-100"
+                      >
+                        <img
+                          src={design.customImage}
+                          alt={design.modelName}
+                          className="w-28 h-28 object-cover rounded-lg border border-gray-200 bg-white"
+                        />
+                        <div className="flex-1 text-center sm:text-left">
+                          <p className="font-semibold text-gray-900">{design.modelName}</p>
+                          <p className="text-sm text-gray-500 mb-3">Listo para descargar</p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              downloadDataUrl(
+                                design.customImage,
+                                `diseno-${design.modelName.replace(/\s+/g, '-')}.png`
+                              )
+                            }
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red text-white text-sm font-semibold rounded-lg hover:bg-brand-red-dark transition-colors"
+                          >
+                            <Download className="w-4 h-4" />
+                            Descargar imagen
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-3">
                 {!isTransfer && (
                   <button
@@ -146,6 +208,25 @@ function SuccessContent() {
                 >
                   Crear otra funda
                 </button>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-100 flex justify-center gap-4 text-sm">
+                <a
+                  href={SOCIAL_LINKS.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-red hover:underline"
+                >
+                  Facebook
+                </a>
+                <a
+                  href={SOCIAL_LINKS.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-red hover:underline"
+                >
+                  Instagram
+                </a>
               </div>
             </div>
           </div>

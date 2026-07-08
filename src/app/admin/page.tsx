@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
 import AdminPricingPanel from '@/components/admin/AdminPricingPanel';
 import AdminAnnouncementsPanel from '@/components/admin/AdminAnnouncementsPanel';
+import { downloadDataUrl, getFirstCustomItem } from '@/lib/download-image';
 import { 
   ShoppingBag, 
   DollarSign, 
@@ -156,6 +157,9 @@ export default function AdminPage() {
         const ordersData: Order[] = data.orders || [];
         setOrders(ordersData);
         setFilteredOrders(ordersData);
+        setExpandedOrders(
+          new Set(ordersData.filter((order) => order.hasCustomDesigns).map((order) => order.id))
+        );
 
         const totalRevenue = ordersData.reduce((acc, order) => acc + (order.amountTotal || 0), 0);
         const pendingOrders = ordersData.filter(o => o.status === 'confirmed' || o.status === 'processing').length;
@@ -529,6 +533,9 @@ export default function AdminPage() {
                       Items
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Diseño
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Total
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -545,12 +552,14 @@ export default function AdminPage() {
                 <tbody className="divide-y divide-gray-200">
                   {filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                         No se encontraron órdenes
                       </td>
                     </tr>
                   ) : (
-                    filteredOrders.map((order) => (
+                    filteredOrders.map((order) => {
+                      const customItem = getFirstCustomItem(order.items);
+                      return (
                       <Fragment key={order.id}>
                         <tr className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4">
@@ -591,6 +600,32 @@ export default function AdminPage() {
                             </span>
                           </td>
                           <td className="px-6 py-4">
+                            {customItem?.customImage ? (
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={customItem.customImage}
+                                  alt={`Diseño ${order.orderId}`}
+                                  className="w-14 h-14 rounded-lg border border-gray-200 object-cover bg-white"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    downloadDataUrl(
+                                      customItem.customImage,
+                                      `diseno-${order.orderId || order.id}.png`
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-brand-red text-white text-xs font-medium rounded-lg hover:bg-brand-red-dark transition-colors"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  Descargar
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">Sin diseño</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
                             <span className="font-bold text-green-600">
                               ${order.amountTotal?.toFixed(2) || '0.00'} MXN
                             </span>
@@ -623,7 +658,7 @@ export default function AdminPage() {
                         {/* Expanded Order Details */}
                         {expandedOrders.has(order.id) && (
                           <tr key={`${order.id}-details`}>
-                            <td colSpan={7} className="px-6 py-6 bg-gradient-to-br from-gray-50 to-gray-100">
+                            <td colSpan={8} className="px-6 py-6 bg-gradient-to-br from-gray-50 to-gray-100">
                               <div className="space-y-6">
                                 <div className="flex items-center justify-between">
                                   <h4 className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -720,14 +755,12 @@ export default function AdminPage() {
                                               {/* Botones de acción */}
                                               <div className="flex gap-2 mt-3">
                                                 <button
-                                                  onClick={() => {
-                                                    const link = document.createElement('a');
-                                                    link.href = item.customImage;
-                                                    link.download = `imagen-personalizada-${order.orderId?.slice(-8) || order.id.slice(-8)}-${idx + 1}.png`;
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    document.body.removeChild(link);
-                                                  }}
+                                                  onClick={() =>
+                                                    downloadDataUrl(
+                                                      item.customImage,
+                                                      `imagen-personalizada-${order.orderId?.slice(-8) || order.id.slice(-8)}-${idx + 1}.png`
+                                                    )
+                                                  }
                                                   className="flex items-center gap-2 px-3 py-2 bg-brand-red text-white text-xs font-medium rounded-lg hover:bg-brand-red-dark transition-colors"
                                                 >
                                                   <Download className="w-4 h-4" />
@@ -900,7 +933,8 @@ export default function AdminPage() {
                           </tr>
                         )}
                       </Fragment>
-                    ))
+                      );
+                    })
                   )}
                 </tbody>
               </table>

@@ -20,6 +20,20 @@ import {
 } from '@/lib/shipping';
 
 const PROMO_STORAGE_KEY = 'checkout_promo';
+const DESIGNS_STORAGE_KEY = 'last_order_designs';
+
+function saveDesignsForSuccess(items: Array<{ modelName: string; customImage?: string | null }>) {
+  const designs = items
+    .filter((item) => item.customImage)
+    .map((item) => ({
+      modelName: item.modelName,
+      customImage: item.customImage as string,
+    }));
+
+  if (designs.length > 0) {
+    sessionStorage.setItem(DESIGNS_STORAGE_KEY, JSON.stringify(designs));
+  }
+}
 
 function CheckoutContent() {
   const { user, loading, emailVerified } = useAuth();
@@ -129,6 +143,7 @@ function CheckoutContent() {
   const handlePayStripe = async () => {
     setStripeLoading(true);
     try {
+      saveDesignsForSuccess(cart);
       const data = await submitCheckout('/api/checkout');
       if (data?.url) {
         sessionStorage.removeItem(PROMO_STORAGE_KEY);
@@ -146,6 +161,7 @@ function CheckoutContent() {
   const handlePayTransfer = async (transferReceipt: string) => {
     setTransferLoading(true);
     try {
+      saveDesignsForSuccess(cart);
       const data = await submitCheckout('/api/checkout/transfer', { transferReceipt });
       if (data?.success) {
         sessionStorage.removeItem(PROMO_STORAGE_KEY);

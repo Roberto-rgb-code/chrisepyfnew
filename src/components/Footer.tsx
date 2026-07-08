@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facebook, Instagram, Twitter, Send } from '@/components/icons';
+import { Facebook, Instagram, Send } from '@/components/icons';
 import { BRAND_LOGO, BRAND_NAME, BRAND_TAGLINE } from '@/lib/brand';
+import { SOCIAL_LINKS } from '@/lib/constants';
 
 export default function Footer() {
   return (
@@ -22,9 +23,24 @@ export default function Footer() {
               Fundas personalizadas de la más alta calidad. Protege tu dispositivo con estilo único.
             </p>
             <div className="flex space-x-3">
-              <Facebook className="w-5 h-5 text-gray-400 hover:text-brand-red cursor-pointer transition-colors" />
-              <Instagram className="w-5 h-5 text-gray-400 hover:text-brand-red cursor-pointer transition-colors" />
-              <Twitter className="w-5 h-5 text-gray-400 hover:text-brand-red cursor-pointer transition-colors" />
+              <a
+                href={SOCIAL_LINKS.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook Empaques y Fundas"
+                className="text-gray-400 hover:text-brand-red transition-colors"
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram Empaques y Fundas"
+                className="text-gray-400 hover:text-brand-red transition-colors"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
