@@ -5,19 +5,22 @@ export interface BankTransferDetails {
   accountNumber: string;
 }
 
+/** Datos bancarios fijos para transferencias (BBVA). */
+export const BANK_TRANSFER_DETAILS: BankTransferDetails = {
+  bankName: 'BBVA',
+  accountHolder: 'EFM LATAM Empaques y Fundas',
+  clabe: '012180015103208822',
+  accountNumber: '1510320882',
+};
+
 export function getBankTransferDetails(): BankTransferDetails {
-  return {
-    bankName: process.env.NEXT_PUBLIC_BANK_NAME || process.env.BANK_NAME || 'BBVA México',
-    accountHolder:
-      process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER ||
-      process.env.BANK_ACCOUNT_HOLDER ||
-      'EFM LATAM Empaques y Fundas',
-    clabe: process.env.NEXT_PUBLIC_BANK_CLABE || process.env.BANK_CLABE || '012180001234567890',
-    accountNumber:
-      process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER ||
-      process.env.BANK_ACCOUNT_NUMBER ||
-      '0123456789',
-  };
+  return BANK_TRANSFER_DETAILS;
+}
+
+export function formatClabe(clabe: string): string {
+  const digits = clabe.replace(/\s/g, '');
+  if (digits.length !== 18) return clabe;
+  return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 17)} ${digits.slice(17)}`;
 }
 
 const ALLOWED_RECEIPT_TYPES = [

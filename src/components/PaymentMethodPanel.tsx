@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { Upload, CreditCard, Building2 } from '@/components/icons';
-import { getBankTransferDetails, fileToDataUrl } from '@/lib/bank-transfer';
+import { getBankTransferDetails, fileToDataUrl, formatClabe } from '@/lib/bank-transfer';
 
 interface PaymentMethodPanelProps {
   total: number;
@@ -93,7 +93,7 @@ export default function PaymentMethodPanel({
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
             <div><dt className="text-gray-500">Banco</dt><dd className="font-medium text-gray-900">{bank.bankName}</dd></div>
             <div><dt className="text-gray-500">Titular</dt><dd className="font-medium text-gray-900">{bank.accountHolder}</dd></div>
-            <div className="sm:col-span-2"><dt className="text-gray-500">CLABE</dt><dd className="font-mono font-medium text-gray-900">{bank.clabe}</dd></div>
+            <div className="sm:col-span-2"><dt className="text-gray-500">CLABE</dt><dd className="font-mono font-medium text-gray-900">{formatClabe(bank.clabe)}</dd></div>
             <div><dt className="text-gray-500">No. cuenta</dt><dd className="font-mono font-medium text-gray-900">{bank.accountNumber}</dd></div>
             <div><dt className="text-gray-500">Monto exacto</dt><dd className="font-bold text-brand-red">${total} MXN</dd></div>
           </dl>

@@ -1,32 +1,24 @@
 import {
+  BANK_TRANSFER_DETAILS,
+  formatClabe,
   getBankTransferDetails,
   validateTransferReceipt,
 } from '@/lib/bank-transfer';
 import { isStripeKeyMismatch } from '@/lib/stripe-config';
 
 describe('Bank transfer payment flow', () => {
-  const originalEnv = process.env;
-
-  beforeEach(() => {
-    process.env = { ...originalEnv };
-  });
-
-  afterAll(() => {
-    process.env = originalEnv;
-  });
-
-  it('loads bank details from public env vars', () => {
-    process.env.NEXT_PUBLIC_BANK_NAME = 'Banco Test';
-    process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER = 'EFM Test';
-    process.env.NEXT_PUBLIC_BANK_CLABE = '012345678901234567';
-    process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER = '9876543210';
-
-    expect(getBankTransferDetails()).toEqual({
-      bankName: 'Banco Test',
-      accountHolder: 'EFM Test',
-      clabe: '012345678901234567',
-      accountNumber: '9876543210',
+  it('returns fixed BBVA bank details from code', () => {
+    expect(getBankTransferDetails()).toEqual(BANK_TRANSFER_DETAILS);
+    expect(BANK_TRANSFER_DETAILS).toEqual({
+      bankName: 'BBVA',
+      accountHolder: 'EFM LATAM Empaques y Fundas',
+      clabe: '012180015103208822',
+      accountNumber: '1510320882',
     });
+  });
+
+  it('formats CLABE for display', () => {
+    expect(formatClabe('012180015103208822')).toBe('012 180 01510320882 2');
   });
 
   it('accepts pdf receipt data url', () => {
