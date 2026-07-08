@@ -12,7 +12,8 @@
     "db:studio": "prisma studio",
     "test": "jest",
     "test:watch": "jest --watch",
-    "seed:admin": "npx tsx scripts/ensure-admin.ts"
+    "seed:admin": "npx tsx scripts/ensure-admin.ts",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules,storage"
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
