@@ -197,4 +197,84 @@ export const emailTemplates = {
       ${data.trackingUrl ? `<p style="text-align:center;"><a href="${data.trackingUrl}" style="background:#059669;color:white;padding:14px 28px;text-decoration:none;border-radius:10px;font-weight:bold;display:inline-block;">Rastrear paquete</a></p>` : ''}`
     ),
   }),
+
+  welcomeAccount: (data: { customerName: string; customerEmail: string }) => ({
+    subject: '🎉 ¡Bienvenido a Empaques & Fundas!',
+    html: emailShell(
+      '¡Qué gusto tenerte aquí!',
+      'Tu cuenta en EFM LATAM fue creada',
+      `
+      <h2 style="color:#111827;margin-top:0;">Hola ${data.customerName}, 💕</h2>
+      <p style="font-size:16px;line-height:1.7;">
+        <strong>¡Bienvenido a la familia EFM LATAM!</strong> Estamos felices de que te unas a nosotros
+        para crear fundas únicas y llenas de estilo para tu celular.
+      </p>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;margin:24px 0;">
+        <p style="margin:0 0 8px;"><strong>Tu correo:</strong> ${data.customerEmail}</p>
+        <p style="margin:0;color:#991b1b;font-size:14px;">Revisa tu bandeja y confirma tu correo para poder comprar.</p>
+      </div>
+      <div style="background:#eff6ff;border-radius:12px;padding:20px;">
+        <h3 style="color:#1d4ed8;margin-top:0;">✨ ¿Qué puedes hacer ahora?</h3>
+        <ul style="color:#1e40af;padding-left:20px;margin:0;line-height:1.8;">
+          <li>Personaliza tu funda con tu foto favorita</li>
+          <li>Guarda diseños en tu cuenta</li>
+          <li>Compra con tarjeta o transferencia bancaria</li>
+        </ul>
+      </div>
+      <p style="text-align:center;margin-top:28px;">
+        <a href="${process.env.NEXT_PUBLIC_URL || 'https://www.empaquesyfundas.com'}/catalogo"
+           style="background:#df2f36;color:white;padding:14px 28px;text-decoration:none;border-radius:10px;font-weight:bold;display:inline-block;">
+          Explorar catálogo
+        </a>
+      </p>`
+    ),
+  }),
+
+  adminNewAccount: (data: {
+    customerName: string;
+    customerEmail: string;
+    userId: string;
+    registeredAt: string;
+  }) => ({
+    subject: `👤 Nuevo registro: ${data.customerEmail}`,
+    html: emailShell(
+      'Nuevo cliente registrado',
+      'Valida que la cuenta exista en el panel admin',
+      `
+      <h2 style="color:#111827;margin-top:0;">Nuevo registro en la tienda</h2>
+      <p>Se creó una cuenta nueva. Revisa en admin que el cliente sea real y confirma la cuenta.</p>
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:20px 0;">
+        <p style="margin:0 0 8px;"><strong>Nombre:</strong> ${data.customerName}</p>
+        <p style="margin:0 0 8px;"><strong>Correo:</strong> ${data.customerEmail}</p>
+        <p style="margin:0 0 8px;"><strong>ID Firebase:</strong> ${data.userId}</p>
+        <p style="margin:0;"><strong>Fecha:</strong> ${new Date(data.registeredAt).toLocaleString('es-MX')}</p>
+      </div>
+      <p style="text-align:center;">
+        <a href="${process.env.NEXT_PUBLIC_URL || 'https://www.empaquesyfundas.com'}/admin"
+           style="background:#df2f36;color:white;padding:14px 28px;text-decoration:none;border-radius:10px;font-weight:bold;display:inline-block;">
+          Ir al panel admin
+        </a>
+      </p>`
+    ),
+  }),
+
+  accountVerified: (data: { customerName: string }) => ({
+    subject: '✅ Tu cuenta fue verificada — Empaques & Fundas',
+    html: emailShell(
+      '¡Tu cuenta está lista!',
+      'Ya puedes comprar con total confianza',
+      `
+      <h2 style="color:#111827;margin-top:0;">Hola ${data.customerName},</h2>
+      <p style="font-size:16px;line-height:1.7;">
+        Nuestro equipo revisó y <strong>confirmó tu cuenta</strong>. Ya estás listo para personalizar
+        y comprar tus fundas en EFM LATAM. 🤗
+      </p>
+      <p style="text-align:center;margin-top:28px;">
+        <a href="${process.env.NEXT_PUBLIC_URL || 'https://www.empaquesyfundas.com'}/catalogo"
+           style="background:#df2f36;color:white;padding:14px 28px;text-decoration:none;border-radius:10px;font-weight:bold;display:inline-block;">
+          Crear mi funda
+        </a>
+      </p>`
+    ),
+  }),
 };

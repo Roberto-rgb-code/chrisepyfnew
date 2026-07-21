@@ -1,4 +1,5 @@
 import { sendOrderEmail } from '../src/lib/send-order-email';
+import { sendNewAccountEmails, sendAccountVerifiedEmail } from '../src/lib/send-account-email';
 
 const targetEmail = process.argv[2] || 'empaquesyfundas@gmail.com';
 
@@ -77,6 +78,22 @@ async function main() {
     const result = await sendOrderEmail(test.type, test.data, targetEmail);
     console.log(`OK (${result?.id})`);
   }
+
+  process.stdout.write('→ welcome_account... ');
+  const welcome = await sendNewAccountEmails({
+    customerName: 'Cliente Prueba',
+    customerEmail: targetEmail,
+    userId: 'test-uid-123',
+    registeredAt: new Date().toISOString(),
+  });
+  console.log(`OK (welcome + admin)`);
+
+  process.stdout.write('→ account_verified... ');
+  const verified = await sendAccountVerifiedEmail({
+    customerName: 'Cliente Prueba',
+    customerEmail: targetEmail,
+  });
+  console.log(`OK (${verified?.id})`);
 
   console.log('\nTodos los correos se enviaron correctamente desde noreply@empaquesyfundas.com');
 }

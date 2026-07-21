@@ -83,6 +83,7 @@ interface ClientSummary {
   id: string;
   email: string;
   displayName: string | null;
+  accountStatus: string;
   createdAt: string;
   ordersCount: number;
   personalizationsCount: number;
@@ -189,6 +190,25 @@ export default function AdminPage() {
   };
 
   const loadOrders = loadAllData;
+
+  const verifyClientAccount = async (clientId: string) => {
+    if (!user) return;
+    try {
+      const response = await fetch(`/api/admin/users/${clientId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.uid, verifyAccount: true }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || 'No se pudo verificar la cuenta');
+        return;
+      }
+      await loadAllData();
+    } catch {
+      alert('Error al verificar la cuenta');
+    }
+  };
 
   // Filtrar órdenes
   useEffect(() => {
@@ -1018,6 +1038,7 @@ export default function AdminPage() {
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Cliente</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Cuenta</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Compras</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Personalizaciones</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Carritos</th>
@@ -1028,7 +1049,7 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-gray-200">
                     {clients.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                        <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                           No hay clientes registrados
                         </td>
                       </tr>
@@ -1038,6 +1059,28 @@ export default function AdminPage() {
                           <td className="px-6 py-4">
                             <p className="font-medium text-gray-900">{client.displayName || 'Sin nombre'}</p>
                             <p className="text-sm text-gray-500">{client.email}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            {client.accountStatus === 'verified' ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <CheckCircle className="w-3.5 h-3.5" />
+                                Verificada
+                              </span>
+                            ) : (
+                              <div className="flex flex-col gap-2">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 w-fit">
+                                  <Clock className="w-3.5 h-3.5" />
+                                  Pendiente
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => verifyClientAccount(client.id)}
+                                  className="px-3 py-1.5 bg-brand-red text-white text-xs font-medium rounded-lg hover:bg-brand-red-dark transition-colors w-fit"
+                                >
+                                  Confirmar cuenta
+                                </button>
+                              </div>
+                            )}
                           </td>
                           <td className="px-6 py-4 text-sm">{client.ordersCount}</td>
                           <td className="px-6 py-4 text-sm">{client.personalizationsCount}</td>

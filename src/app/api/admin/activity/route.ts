@@ -90,9 +90,9 @@ export async function GET(request: NextRequest) {
           clientName: u.displayName,
           description: 'Nuevo cliente registrado',
           amount: null,
-          status: 'registered',
+          status: u.accountStatus === 'verified' ? 'verified' : 'pending',
           createdAt: u.createdAt.toISOString(),
-          metadata: { role: u.role },
+          metadata: { role: u.role, accountStatus: u.accountStatus },
         })),
     ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -117,6 +117,7 @@ export async function GET(request: NextRequest) {
       id: client.id,
       email: client.email,
       displayName: client.displayName,
+      accountStatus: client.accountStatus,
       createdAt: client.createdAt.toISOString(),
       ordersCount: client._count.orders,
       personalizationsCount: client._count.personalizations,
