@@ -69,13 +69,20 @@ export async function sendOrderEmail(
   }
 
   const skipAttachments = type === 'transfer_pending';
-  const attachments = skipAttachments
+  let attachments = skipAttachments
     ? []
     : prepared.attachments.map((att) => ({
         filename: att.filename,
         content: att.content,
         content_id: att.cid,
       }));
+
+  const maxAttachmentBytes = 4 * 1024 * 1024;
+  const attachmentBytes = attachments.reduce((sum, att) => sum + att.content.length, 0);
+  if (attachmentBytes > maxAttachmentBytes) {
+    console.warn('Email attachments skipped: total size exceeds Resend limit');
+    attachments = [];
+  }
 
   const fromAddress =
     process.env.RESEND_FROM || 'Empaques & Fundas <noreply@empaquesyfundas.com>';

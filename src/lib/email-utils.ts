@@ -13,6 +13,7 @@ export interface EmailReadyItem {
 }
 
 export function formatOrderNumber(orderId: string): string {
+  if (orderId.startsWith('TRF-')) return orderId;
   return orderId.slice(-8).toUpperCase();
 }
 

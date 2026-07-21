@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isUserAdmin } from '@/lib/admin';
 import { sendOrderEmail } from '@/lib/send-order-email';
+import { orderToShippingDetails } from '@/lib/shipping';
 
 export async function PATCH(
   request: NextRequest,
@@ -37,6 +38,7 @@ export async function PATCH(
     });
 
     const items = (order.items as any[]) || [];
+    const shippingDetails = orderToShippingDetails(order) || undefined;
     const emailPayload = {
       id: order.orderId,
       customerName: order.customerName || order.customerEmail.split('@')[0],
@@ -44,14 +46,23 @@ export async function PATCH(
       total: order.amountTotal,
       items,
       date: order.orderDate.toISOString(),
+      shippingDetails,
     };
 
-    if (confirmPayment) {
-      await sendOrderEmail('order_confirmation', emailPayload, order.customerEmail);
-    } else if (status === 'processing') {
-      await sendOrderEmail('order_processing', emailPayload, order.customerEmail);
-    } else if (status === 'shipped') {
-      await sendOrderEmail('order_shipped', emailPayload, order.customerEmail);
+    try {
+      if (confirmPayment) {
+        await sendOrderEmail('order_confirmation', emailPayload, order.customerEmail);
+      } else if (status === 'processing') {
+        await sendOrderEmail('order_processing', emailPayload, order.customerEmail);
+      } else if (status === 'shipped') {
+        await sendOrderEmail('order_shipped', emailPayload, order.customerEmail);
+      }
+    } catch (emailError) {
+      console.error('Error sending order status email:', emailError);
+      return NextResponse.json(
+        { error: 'Orden actualizada, pero no se pudo enviar el correo al cliente.' },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({ order });

@@ -9,7 +9,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Datos incompletos' }, { status: 400 });
     }
 
-    const validTypes = ['order_confirmation', 'order_processing', 'order_shipped'];
+    const validTypes = [
+      'order_confirmation',
+      'order_processing',
+      'order_shipped',
+      'transfer_pending',
+    ];
     if (!validTypes.includes(type)) {
       return NextResponse.json({ error: 'Tipo de email no válido' }, { status: 400 });
     }
@@ -19,6 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, messageId: data?.id });
   } catch (error) {
     console.error('Error en send-email API:', error);
-    return NextResponse.json({ error: 'Error enviando email' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Error enviando email';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

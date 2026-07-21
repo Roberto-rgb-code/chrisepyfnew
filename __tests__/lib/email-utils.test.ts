@@ -16,6 +16,10 @@ describe('email-utils', () => {
     ],
   };
 
+  it('formats transfer order number without truncation', () => {
+    expect(formatOrderNumber('TRF-AB12CD34')).toBe('TRF-AB12CD34');
+  });
+
   it('formats order number from session id', () => {
     expect(formatOrderNumber('cs_test_abcdefghijklmnop')).toBe('IJKLMNOP');
   });

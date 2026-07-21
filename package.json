@@ -12,6 +12,7 @@
     "db:studio": "prisma studio",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:emails": "tsx --env-file=.env scripts/test-all-emails.ts",
     "seed:admin": "npx tsx scripts/ensure-admin.ts",
     "firebase:deploy:rules": "firebase deploy --only firestore:rules,storage"
   },

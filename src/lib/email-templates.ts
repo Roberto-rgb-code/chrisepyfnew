@@ -55,7 +55,7 @@ function emailShell(title: string, subtitle: string, body: string) {
     ${body}
   </div>
   <div style="background:#f1f5f9;padding:20px;text-align:center;border-radius:0 0 16px 16px;border:1px solid #e5e7eb;border-top:none;">
-    <p style="margin:0;color:#6b7280;font-size:13px;">© 2025 Empaques & Fundas · empaquesyfundas.com</p>
+    <p style="margin:0;color:#6b7280;font-size:13px;">© 2026 Empaques & Fundas · empaquesyfundas.com</p>
     <p style="margin:8px 0 0;color:#6b7280;font-size:13px;">📧 soporte@empaquesyfundas.com · 📱 +52 33 1149 3852</p>
     ${emailSocialLinks}
   </div>

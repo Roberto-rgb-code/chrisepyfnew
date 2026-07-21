@@ -195,6 +195,42 @@ export function shippingDetailsToMetadata(details: ShippingDetails): Record<stri
   };
 }
 
+export function orderToShippingDetails(order: {
+  customerEmail: string;
+  shippingFirstName?: string | null;
+  shippingLastName?: string | null;
+  shippingWhatsApp?: string | null;
+  shippingStreet?: string | null;
+  shippingNeighborhood?: string | null;
+  shippingPostalCode?: string | null;
+  shippingCity?: string | null;
+  shippingState?: string | null;
+  shippingNotes?: string | null;
+  shippingRecipient?: string | null;
+  shippingPhone2?: string | null;
+  hasValidIne?: boolean | null;
+}): ShippingDetails | null {
+  if (!order.shippingStreet || !order.shippingFirstName || !order.shippingWhatsApp) {
+    return null;
+  }
+
+  return {
+    firstName: order.shippingFirstName,
+    lastName: order.shippingLastName || '',
+    whatsApp: order.shippingWhatsApp,
+    email: order.customerEmail,
+    street: order.shippingStreet,
+    neighborhood: order.shippingNeighborhood || '',
+    postalCode: order.shippingPostalCode || '',
+    city: order.shippingCity || '',
+    state: order.shippingState || '',
+    deliveryNotes: order.shippingNotes || undefined,
+    recipientName: order.shippingRecipient || `${order.shippingFirstName} ${order.shippingLastName || ''}`.trim(),
+    secondaryPhone: order.shippingPhone2 || undefined,
+    hasValidIne: order.hasValidIne ?? true,
+  };
+}
+
 export function metadataToShippingDetails(metadata: Record<string, string | undefined>): ShippingDetails | null {
   const input: ShippingDetailsInput = {
     firstName: metadata.shipFirstName,
